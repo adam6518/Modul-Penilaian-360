@@ -1,70 +1,21 @@
-@extends('layouts.app', ['title' => 'Dashboard'])
+@extends('layouts.app', ['title' => 'Home'])
 
 @section('content')
-    <h1 class="fw-bold mb-4">Periode</h1>
-    <div class="input-group mb-3 border border-secondary rounded-2" style="max-width: 100%;">
-        <span class="input-group-text" <svg class="rounded-4" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
-            viewBox="0 -960 960 960" fill="#888">
-            <svg class="rounded-4" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 -960 960 960"
-                fill="#888">
-                <path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109
-                                                75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252
-                                                252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75
-                                                0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z" />
-            </svg>
-        </span>
-        <input type="text" class="form-control form-control-sm border-start-0" placeholder="Cari informasi di sini...">
-    </div>
-
-    <div class="card shadow-sm">
-        <div class="card-body">
-
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead class="table-dark text-center">
-                        <tr>
-                            <th>No</th>
-                            <th>Nama Periode</th>
-                            <th>Tanggal Awal</th>
-                            <th>Tanggal Akhir</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @php
-                            $dummy = [
-                                ['nama' => 'Budi Santoso', 'dept' => 'Finance', 'nilai' => 87, 'status' => 'Selesai'],
-                                ['nama' => 'Agnes Lestari', 'dept' => 'HRD', 'nilai' => 92, 'status' => 'Selesai'],
-                                ['nama' => 'Rizky Pratama', 'dept' => 'IT', 'nilai' => 75, 'status' => 'Proses'],
-                                [
-                                    'nama' => 'Dina Ramadhani',
-                                    'dept' => 'Marketing',
-                                    'nilai' => 80,
-                                    'status' => 'Selesai',
-                                ],
-                            ];
-                        @endphp
-
-                        @foreach ($dummy as $i => $row)
-                            <tr>
-                                <td class="text-center">{{ $i + 1 }}</td>
-                                <td>{{ $row['dept'] }}</td>
-                                <td class="text-center">{{ $row['nilai'] }}</td>
-                                <td class="text-center">
-                                    <span class="badge {{ $row['status'] === 'Selesai' ? 'bg-success' : 'bg-warning' }}">
-                                        {{ $row['status'] }}
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    <button class="btn btn-sm btn-primary">Detail</button>
-                                    <button class="btn btn-sm btn-danger">Hapus</button>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-
-        </div>
+    <style>
+        .home {
+            margin-top: 20vh
+        }
+    </style>
+    <div class="home container d-grid align-items-center justify-content-center">
+        <h1>Selamat Datang di Modul Penilaian 360 !</h1>
+        <p>
+            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ut ea porro tenetur provident nisi iure laudantium non
+            amet sunt eos minima, reprehenderit magnam reiciendis repellendus voluptatibus. Porro expedita consequuntur eos
+            asperiores laborum magnam hic incidunt perspiciatis, nam pariatur, a assumenda cum possimus commodi dolorem quos
+            maxime, totam sed officia necessitatibus doloribus? Sint eligendi officiis culpa quasi minima voluptatem
+            nesciunt, reprehenderit aliquam ut quis, rem dolore laudantium voluptatibus in ab facere iusto, illo ipsam optio
+            odit. Eveniet necessitatibus aspernatur ea sit eum eligendi corrupti dolor iure beatae voluptatem! In ipsam
+            mollitia, unde nihil placeat quos voluptates, doloribus, corporis blanditiis quibusdam iusto!
+        </p>
     </div>
 @endsection

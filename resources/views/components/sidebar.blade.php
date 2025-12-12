@@ -31,7 +31,7 @@
     <div class="offcanvas-body d-flex flex-column">
 
         <div class="d-grid gap-4 w-100">
-            <button class="btn btn-success" type="button">Periode</button>
+            <button class="btn btn-success" type="button"><a href="{{ url('/periode') }}">Periode</a></button>
             <button class="btn btn-success" type="button">Referensi</button>
             <button class="btn btn-success" type="button">Penilaian</button>
             <button class="btn btn-success" type="button">Periode Pegawai</button>

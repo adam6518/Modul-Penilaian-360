@@ -8,8 +8,9 @@ Route::get('/', function () {
 });
 
 Route::get('/periode', [PeriodeController::class, 'index'])->name('periode.index');
-
 Route::get('/periode/data', [PeriodeController::class, 'getData'])->name('periode.data');
 Route::post('/periode/store', [PeriodeController::class, 'store'])->name('periode.store');
 Route::post('/periode/update/{id}', [PeriodeController::class, 'update'])->name('periode.update');
 Route::delete('/periode/delete/{id}', [PeriodeController::class, 'delete'])->name('periode.delete');
+
+Route::get('/referensi', [PeriodeController::class, 'index'])->name('referensi.index');

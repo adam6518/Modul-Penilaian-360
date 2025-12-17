@@ -6,7 +6,9 @@
         <h6 class="fw-bold mb-4">Selamat datang User !</h6>
 
         <div class="d-grid gap-4 w-100">
-            <button class="btn btn-success btn-l" type="button">Periode</button>
+            <a href="{{ route('periode.index') }}" class="btn btn-success btn-l">
+                Periode
+            </a>
             <button class="btn btn-success btn-l" type="button">Referensi</button>
             <button class="btn btn-success btn-l" type="button">Penilaian</button>
             <button class="btn btn-success btn-l" type="button">Periode Pegawai</button>
@@ -31,7 +33,10 @@
     <div class="offcanvas-body d-flex flex-column">
 
         <div class="d-grid gap-4 w-100">
-            <button class="btn btn-success" type="button"><a href="{{ url('/periode') }}">Periode</a></button>
+            <a href="{{ route('periode.index') }}" class="btn btn-success">
+                Periode
+            </a>
+
             <button class="btn btn-success" type="button">Referensi</button>
             <button class="btn btn-success" type="button">Penilaian</button>
             <button class="btn btn-success" type="button">Periode Pegawai</button>

@@ -19,12 +19,7 @@ class PeriodeController extends Controller
     {
         return response()->json(Periode::all());
     }
-    // public function data()
-    // {
-    //     $data = Periode::all();
-    //     return response()->json($data);
-    // }
-
+    
     // Create Periode
     public function store(Request $request)
     {
@@ -46,8 +41,18 @@ class PeriodeController extends Controller
     // Update Periode
     public function update(Request $request, $id)
     {
+        $validator = Validator::make($request->all(), [
+            'nama_periode' => 'required',
+            'tanggal_awal' => 'required|date',
+            'tanggal_akhir' => 'required|date|after_or_equal:tanggal_awal'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
         $periode = Periode::findOrFail($id);
-        $periode->update($request->all());
+        $periode->update($validator->validated());
 
         return response()->json($periode);
     }

@@ -49,6 +49,7 @@
                             <th>Nama Periode</th>
                             <th>Tanggal Awal</th>
                             <th>Tanggal Akhir</th>
+                            <th>Status</th>
                             <th>Aksi</th>
                         </tr>
                         {{-- Search Row (Responsive Bootstrap Only) --}}
@@ -77,6 +78,7 @@
                             </th>
 
                             <th></th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody id="periodeTableBody">
@@ -89,10 +91,10 @@
     </div>
     {{-- Simple JS --}}
     <script>
-        document.getElementById('btnTambah').addEventListener('click', function() {
+        {{--  document.getElementById('btnTambah').addEventListener('click', function() {
             document.getElementById('formTambah').classList.remove('d-none');
             this.classList.add('d-none');
-        });
+        });  --}}
 
         document.getElementById('btnBatal').addEventListener('click', function() {
             document.getElementById('formTambah').classList.add('d-none');
@@ -124,28 +126,14 @@
                 success: function(data) {
                     periodeData = data
                     renderTable(data)
-                    let rows = "";
-                    data.forEach((item, index) => {
-                        rows += `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td>${item.nama_periode}</td>
-                        <td>${item.tanggal_awal}</td>
-                        <td>${item.tanggal_akhir}</td>
-                        <td>
-                            <button class="btn btn-primary btn-sm editBtn"
-                            data-id="${item.id}"
-                            data-nama="${item.nama_periode}"
-                            data-awal="${item.tanggal_awal}"
-                            data-akhir="${item.tanggal_akhir}">Edit</button>
-                            <button class="btn btn-danger btn-sm deleteBtn" data-id="${item.id}">Hapus</button>
-                        </td>
-                    </tr>
-                `;
-                    });
-                    $("#periodeTableBody").html(rows);
                 }
             });
+        }
+
+        function renderStatus(status) {
+            if (status == 1) return '<span class="badge bg-success">Aktif</span>';
+            if (status == 0) return '<span class="badge bg-secondary">Selesai</span>';
+            return '';
         }
 
         function renderTable(data) {
@@ -158,6 +146,7 @@
             <td>${item.nama_periode}</td>
             <td>${item.tanggal_awal}</td>
             <td>${item.tanggal_akhir}</td>
+            <td>${renderStatus(item.status)}</td>
             <td>
                 <button
                     type="button"
@@ -182,7 +171,6 @@
             $("#periodeTableBody").html(rows);
         }
 
-
         $(document).ready(function() {
             loadData(); // initial load
 
@@ -198,7 +186,7 @@
                     if (colIndex == 2) value = item.tanggal_awal;
                     if (colIndex == 3) value = item.tanggal_akhir;
 
-                    return value.toLowerCase().includes(keyword);
+                    return (value ?? '').toString().toLowerCase().includes(keyword);
                 });
 
                 renderTable(filtered);
@@ -207,6 +195,7 @@
 
             // tombol tambah / batal (UI)
             $('#btnTambah').on('click', function() {
+                $('#periode_id').val('');
                 $('#formTambah').removeClass('d-none');
                 $(this).addClass('d-none');
             });
@@ -293,9 +282,6 @@
                 $.ajax({
                         url: '/periode/delete/' + id,
                         type: 'DELETE',
-                        {{--  data: {
-                            _token: '{{ csrf_token() }}'
-                        },  --}}
                         dataType: 'json',
                         headers: {
                             'Accept': 'application/json'

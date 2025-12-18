@@ -11,7 +11,8 @@ class Periode extends Model
     protected $fillable = [
         'nama_periode',
         'tanggal_awal',
-        'tanggal_akhir'
+        'tanggal_akhir',
+        'status'
     ];
 
     public $timestamps = false; // Karena tabel database tidak punya created_at & updated_at

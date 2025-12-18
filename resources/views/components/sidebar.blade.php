@@ -1,4 +1,6 @@
-{{-- Desktop Sidebar --}}
+<link href="app.css" rel="stylesheet">
+
+{-- Desktop Sidebar --}}
 <div class="sidebar bg-white border-end p-4 d-none d-lg-flex flex-column" style="min-height: 100vh;">
 
     <div>
@@ -9,7 +11,9 @@
             <a href="{{ route('periode.index') }}" class="btn btn-success btn-l">
                 Periode
             </a>
-            <button class="btn btn-success btn-l" type="button">Referensi</button>
+            <a href="{{ route('referensi.index') }}" class="btn btn-success btn-l">
+                Referensi
+            </a>
             <button class="btn btn-success btn-l" type="button">Penilaian</button>
             <button class="btn btn-success btn-l" type="button">Periode Pegawai</button>
             <button class="btn btn-success btn-l" type="button">Kalkulasi Penilaian</button>

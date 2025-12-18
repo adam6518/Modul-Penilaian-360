@@ -1,40 +1,36 @@
-@extends('layouts.app', ['title' => 'Periode'])
+@extends('layouts.app', ['title' => 'referensi'])
 
 @section('content')
-    <h1 class="fw-bold mb-4">Periode</h1>
+    <h1 class="fw-bold mb-4">Referensi</h1>
 
     {{-- Button Tambah --}}
     <div class="mb-3">
-        <button id="btnTambah" class="btn btn-success btn-sm">Tambah Periode</button>
+        <button id="btnTambah" class="btn btn-success btn-sm">Tambah Referensi</button>
     </div>
 
     {{-- Hidden Form --}}
     <div id="formTambah" class="card shadow-sm mb-4 d-none">
         <div class="card-body">
             <div class="row g-3">
-                <input type="hidden" id="periode_id">
+                <input type="hidden" id="referensi_id">
 
                 <div class="col-md-4">
-                    <label class="form-label">Nama Periode</label>
-                    <input id="nama_periode" type="text" class="form-control form-control-sm">
+                    <label class="form-label">Referensi</label>
+                    <input id="referensi" type="text" class="form-control form-control-sm">
                 </div>
 
                 <div class="col-md-4">
-                    <label class="form-label">Tanggal Awal</label>
-                    <input id="tanggal_awal" type="date" class="form-control form-control-sm">
+                    <label class="form-label">Nilai (%)</label>
+                    <input class="form-control form-control-sm" id="nilai" type="number" name="nilai" step="0.01"
+                        min="0" max="100" inputmode="decimal" placeholder="Contoh: 20 (Tanpa Ketik %)">
                 </div>
 
-                <div class="col-md-4">
-                    <label class="form-label">Tanggal Akhir</label>
-                    <input id="tanggal_akhir" type="date" class="form-control form-control-sm">
+                <div class="d-flex justify-content-end gap-2 mt-3">
+                    <button id="btnSimpan" class="btn btn-primary btn-sm">Simpan</button>
+                    <button id="btnBatal" class="btn btn-secondary btn-sm">Batal</button>
                 </div>
+
             </div>
-
-            <div class="d-flex justify-content-end gap-2 mt-3">
-                <button id="btnSimpan" class="btn btn-primary btn-sm">Simpan</button>
-                <button id="btnBatal" class="btn btn-secondary btn-sm">Batal</button>
-            </div>
-
         </div>
     </div>
 
@@ -46,9 +42,9 @@
                     <thead class="table-dark text-center table-group-divider">
                         <tr>
                             <th>No</th>
-                            <th>Nama Periode</th>
-                            <th>Tanggal Awal</th>
-                            <th>Tanggal Akhir</th>
+                            <th>Referensi</th>
+                            <th>Nilai</th>
+                            <th>Status Akhir</th>
                             <th>Aksi</th>
                         </tr>
                         {{-- Search Row (Responsive Bootstrap Only) --}}
@@ -57,21 +53,21 @@
 
                             <th>
                                 <div class="d-flex flex-column flex-lg-row gap-2">
-                                    <input type="text" class="form-control form-control-sm"
-                                        placeholder="Cari Nama Periode" data-col="1">
+                                    <input type="text" class="form-control form-control-sm" placeholder="Cari Referensi"
+                                        data-col="1">
                                 </div>
                             </th>
 
                             <th>
                                 <div class="d-flex flex-column flex-lg-row gap-2">
-                                    <input type="text" class="form-control form-control-sm" placeholder="Cari Tgl Awal"
+                                    <input type="text" class="form-control form-control-sm" placeholder="Cari Nilai"
                                         data-col="2">
                                 </div>
                             </th>
 
                             <th>
                                 <div class="d-flex flex-column flex-lg-row gap-2">
-                                    <input type="text" class="form-control form-control-sm" placeholder="Cari Tgl Akhir"
+                                    <input type="text" class="form-control form-control-sm" placeholder="Cari Status"
                                         data-col="3">
                                 </div>
                             </th>
@@ -79,7 +75,7 @@
                             <th></th>
                         </tr>
                     </thead>
-                    <tbody id="periodeTableBody">
+                    <tbody id="referensiTableBody">
 
                     </tbody>
                 </table>
@@ -87,12 +83,13 @@
 
         </div>
     </div>
+
     {{-- Simple JS --}}
     <script>
-        document.getElementById('btnTambah').addEventListener('click', function() {
-            document.getElementById('formTambah').classList.remove('d-none');
-            this.classList.add('d-none');
-        });
+        {{--  document.getElementById('btnTambah').addEventListener('click', function() {
+                document.getElementById('formTambah').classList.remove('d-none');
+                this.classList.add('d-none');
+            });  --}}
 
         document.getElementById('btnBatal').addEventListener('click', function() {
             document.getElementById('formTambah').classList.add('d-none');
@@ -102,7 +99,7 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
         // State untuk menyimpan hasil all data
-        let periodeData = [];
+        let referensiData = [];
 
         $.ajaxSetup({
             headers: {
@@ -119,69 +116,50 @@
         function loadData() {
 
             $.ajax({
-                url: "/periode/data",
+                url: "/referensi/data",
                 type: "GET",
                 success: function(data) {
-                    periodeData = data
+                    referensiData = data
                     renderTable(data)
-                    let rows = "";
-                    data.forEach((item, index) => {
-                        rows += `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td>${item.nama_periode}</td>
-                        <td>${item.tanggal_awal}</td>
-                        <td>${item.tanggal_akhir}</td>
-                        <td>
-                            <button class="btn btn-primary btn-sm editBtn"
-                            data-id="${item.id}"
-                            data-nama="${item.nama_periode}"
-                            data-awal="${item.tanggal_awal}"
-                            data-akhir="${item.tanggal_akhir}">Edit</button>
-                            <button class="btn btn-danger btn-sm deleteBtn" data-id="${item.id}">Hapus</button>
-                        </td>
-                    </tr>
-                `;
-                    });
-                    $("#periodeTableBody").html(rows);
                 }
-            });
+            })
+        }
+
+        function renderStatus(status) {
+            if (status == 1) return '<span class="badge bg-success">Aktif</span>';
+            return '';
         }
 
         function renderTable(data) {
-            let rows = "";
-
+            let rows = '';
             data.forEach((item, index) => {
                 rows += `
-        <tr>
-            <td>${index + 1}</td>
-            <td>${item.nama_periode}</td>
-            <td>${item.tanggal_awal}</td>
-            <td>${item.tanggal_akhir}</td>
-            <td>
-                <button
-                    type="button"
-                    class="btn btn-primary btn-sm editBtn"
-                    data-id="${item.id}"
-                    data-nama="${item.nama_periode}"
-                    data-awal="${item.tanggal_awal}"
-                    data-akhir="${item.tanggal_akhir}">
-                    Edit
-                </button>
-                <button
-                    type="button"
-                    class="btn btn-danger btn-sm deleteBtn"
-                    data-id="${item.id}">
-                    Hapus
-                </button>
-            </td>
-        </tr>
+            <tr>
+                <td>${index + 1}</td>
+                <td>${item.referensi}</td>
+                <td>
+                    ${item.nilai !== null && !isNaN(item.nilai)
+                    ? parseFloat(item.nilai).toFixed(2) + '%'
+                    : '-'}
+                </td>
+                <td>${renderStatus(item.status)}</td>
+                <td>
+                    <button class="btn btn-primary btn-sm editBtn"
+                        data-id="${item.id}"
+                        data-referensi="${item.referensi}"
+                        data-nilai="${item.nilai}">
+                        Edit
+                    </button>
+                    <button class="btn btn-danger btn-sm deleteBtn"
+                        data-id="${item.id}">
+                        Hapus
+                    </button>
+                </td>
+            </tr>
         `;
             });
-
-            $("#periodeTableBody").html(rows);
+            $('#referensiTableBody').html(rows);
         }
-
 
         $(document).ready(function() {
             loadData(); // initial load
@@ -191,12 +169,11 @@
                 const colIndex = $(this).data('col');
                 const keyword = $(this).val().toLowerCase();
 
-                const filtered = periodeData.filter(item => {
+                const filtered = referensiData.filter(item => {
                     let value = '';
 
-                    if (colIndex == 1) value = item.nama_periode;
-                    if (colIndex == 2) value = item.tanggal_awal;
-                    if (colIndex == 3) value = item.tanggal_akhir;
+                    if (colIndex == 1) value = item.referensi;
+                    if (colIndex == 2) value = parseFloat(item.nilai).toFixed(2);
 
                     return value.toLowerCase().includes(keyword);
                 });
@@ -212,104 +189,87 @@
             });
 
             $('#btnBatal').on('click', function() {
-                $('#formTambah').addClass('d-none');
-                $('#btnTambah').removeClass('d-none');
+                resetForm();
             });
 
             // CREATE — ikat ke button dengan id spesifik
             $('#btnSimpan').on('click', function(e) {
                 e.preventDefault();
 
-                const id = $('#periode_id').val();
+                let nilaiRaw = $('#nilai').val();
+
+                // normalisasi koma ke titik (defensive)
+                nilaiRaw = nilaiRaw.replace(',', '.');
+
+                const id = $('#referensi_id').val();
 
                 const payload = {
-                    nama_periode: $('#nama_periode').val(),
-                    tanggal_awal: $('#tanggal_awal').val(),
-                    tanggal_akhir: $('#tanggal_akhir').val()
+                    referensi: $('#referensi').val(),
+                    nilai: parseFloat(nilaiRaw)
                 };
 
-                let url = '/periode/store';
-                let method = 'POST';
-
-                if (id) {
-                    url = '/periode/update/' + id;
+                let url = '/referensi/store';
+                if (id) url = '/referensi/update/' + id;
+                if (isNaN(payload.nilai)) {
+                    showMessage('Nilai harus berupa angka (gunakan titik, bukan koma)', 'error');
+                    return;
                 }
 
-                $.ajax({
-                        url: url,
-                        method: method,
-                        data: payload,
-                        dataType: 'json',
-                        headers: {
-                            'Accept': 'application/json'
-                        }
-                    })
+
+                $.post(url, payload)
                     .done(function() {
                         loadData();
-
-                        // reset
-                        $('#periode_id').val('');
-                        $('#nama_periode').val('');
-                        $('#tanggal_awal').val('');
-                        $('#tanggal_akhir').val('');
-
-                        $('#formTambah').addClass('d-none');
-                        $('#btnTambah').removeClass('d-none');
-
-                        showMessage('Data berhasil disimpan.');
+                        resetForm();
+                        showToast('Data berhasil disimpan');
                     })
-                    .fail(function(jqXHR) {
-                        if (jqXHR.status === 422) {
-                            let msgs = [];
-                            $.each(jqXHR.responseJSON.errors, function(_, v) {
-                                msgs.push(v.join(', '));
-                            });
-                            showMessage(msgs.join(' | '), 'error');
-                        } else {
-                            showMessage('Terjadi kesalahan server.', 'error');
-                        }
+                    .fail(function(xhr) {
+                        showToast('Validasi gagal', 'error');
                     });
             });
 
-
             // EDIT
+            // Set form value
             $(document).on('click', '.editBtn', function() {
-                $('#periode_id').val($(this).data('id'));
-                $('#nama_periode').val($(this).data('nama'));
-                $('#tanggal_awal').val($(this).data('awal'));
-                $('#tanggal_akhir').val($(this).data('akhir'));
+                $('#referensi_id').val($(this).data('id'));
+                $('#referensi').val($(this).data('referensi'))
+                $('#nilai').val(parseFloat(nilai).toFixed(2));
 
+                // Tampilkan form
                 $('#formTambah').removeClass('d-none');
                 $('#btnTambah').addClass('d-none');
-            });
+            })
 
+            // RESET FORM SETELAH EDIT SELESAI
+            function resetForm() {
+                $('#referensi_id').val('');
+                $('#referensi').val('');
+                $('#nilai').val('');
+                $('#formTambah').addClass('d-none');
+                $('#btnTambah').removeClass('d-none');
+            }
 
             // DELETE
             $(document).on('click', '.deleteBtn', function() {
-                if (!confirm('Yakin ingin menghapus periode ini?')) return;
+                if (!confirm('Yakin hapus referensi ini?')) return;
 
-                let id = $(this).data('id');
+                const id = $(this).data('id');
 
                 $.ajax({
-                        url: '/periode/delete/' + id,
-                        type: 'DELETE',
-                        {{--  data: {
-                            _token: '{{ csrf_token() }}'
-                        },  --}}
-                        dataType: 'json',
-                        headers: {
-                            'Accept': 'application/json'
-                        }
-                    })
-                    .done(function() {
-                        loadData();
-                        showMessage('Periode berhasil dihapus.');
-                    })
-                    .fail(function(jqXHR) {
-                        console.error('Delete gagal:', jqXHR);
-                        showMessage('Gagal menghapus periode.', 'error');
-                    });
+                    url: '/referensi/delete/' + id,
+                    type: 'DELETE',
+                    dataType: 'json',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                }).done(function() {
+                    loadData();
+                    showToast('Referensi berhasil dihapus');
+                }).fail(function(jqXHR) {
+                    console.error('Delete gagal:', jqXHR);
+                    showMessage('Gagal menghapus referensi.', 'error')
+                })
             });
+
 
             // (Opsional) Edit handler skeleton — implement nanti
             $(document).on('click', '.btnEdit', function() {

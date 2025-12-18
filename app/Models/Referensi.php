@@ -3,20 +3,20 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-// use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Referensi extends Model
 {
-    // use SoftDeletes;
-
     protected $table = 'referensi';
 
     protected $fillable = [
         'referensi',
-        'nilai'
+        'nilai',
+        'status'
     ];
 
-    // protected $dates = ['deleted_at'];
+    protected $casts = [
+        'nilai' => 'float'
+    ];
 
     public $timestamps = false;
 }

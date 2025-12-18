@@ -17,9 +17,11 @@ class PeriodeController extends Controller
     // Ambil semua data (AJAX)
     public function getData()
     {
-        return response()->json(Periode::all());
+        return response()->json(
+            Periode::where('status', '!=', 9)->get()
+        );
     }
-    
+
     // Create Periode
     public function store(Request $request)
     {
@@ -33,7 +35,12 @@ class PeriodeController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $periode = Periode::create($validator->validated());
+        // $periode = Periode::create($validator->validated());
+        $data = $validator->validated();
+        $data['status'] = 1;
+
+        $periode = Periode::create($data);
+
 
         return response()->json($periode, 201);
     }
@@ -61,7 +68,12 @@ class PeriodeController extends Controller
     public function delete($id)
     {
         $periode = Periode::findOrFail($id);
-        $periode->delete();
+        if ($periode->status == 0) {
+            return response()->json([
+                'message' => 'Periode sudah selesai dan tidak bisa dihapus'
+            ], 422);
+        }
+        $periode->update(['status' => 9]);
 
         return response()->json(['success' => true]);
     }

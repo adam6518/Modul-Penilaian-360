@@ -77,4 +77,14 @@ class PeriodeController extends Controller
 
         return response()->json(['success' => true]);
     }
+
+    // Get List Nama Periode untuk di Halaman Periode Pegawai
+    public function getList()
+    {
+        return response()->json(
+            Periode::where('status', '!=', 9)
+                ->select('id', 'nama_periode')
+                ->get()
+        );
+    }
 }

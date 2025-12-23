@@ -8,13 +8,20 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ $title ?? 'Modul Penilaian 360' }}</title>
+    <link rel="stylesheet" href="fonts.googleapis.com">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
+        body {
+            font-style: 'Poppins';
+        }
+
         .sidebar {
             width: 20%;
             min-height: 100vh;
+            background: #073D5F;
+            {{--  background: linear-gradient(90deg, rgba(2, 0, 36, 1) 0%, rgba(6, 119, 136, 1) 100%, rgba(6, 119, 136, 1) 100%);  --}} color: white;
         }
 
         .content-area {

@@ -1,6 +1,22 @@
 @extends('layouts.app', ['title' => 'Periode'])
 
 @section('content')
+    <style>
+        #btnTambah {
+            background-color: #2E7D32;
+        }
+
+        .btn-primary {
+            background-color: #1F3A5F;
+        }
+        .btn-danger {
+            background-color: #C62828;
+        }
+        .btn-secondary {
+            background-color: #4A6FA5;
+        }
+    </style>
+
     <h1 class="fw-bold mb-4">Periode</h1>
 
     {{-- Button Tambah --}}

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PeriodeController;
 use App\Http\Controllers\ReferensiController;
 // use App\Http\Controllers\PenilaianController;
+use App\Http\Controllers\PeriodePegawaiController;
 
 Route::get('/', function () {
     return view('dashboard');
@@ -13,6 +14,7 @@ Route::get('/periode', [PeriodeController::class, 'index'])->name('periode.index
 Route::get('/periode/data', [PeriodeController::class, 'getData'])->name('periode.data');
 Route::post('/periode/store', [PeriodeController::class, 'store'])->name('periode.store');
 Route::post('/periode/update/{id}', [PeriodeController::class, 'update'])->name('periode.update');
+Route::get('/periode/list', [PeriodeController::class, 'getList']);
 
 Route::delete('/periode/delete/{id}', [PeriodeController::class, 'delete'])->name('periode.delete');
 Route::get('/referensi', [ReferensiController::class, 'index'])->name('referensi.index');
@@ -21,4 +23,8 @@ Route::post('/referensi/store', [ReferensiController::class, 'store']);
 Route::post('/referensi/update/{id}', [ReferensiController::class, 'update']);
 Route::delete('/referensi/delete/{id}', [ReferensiController::class, 'delete']);
 
-// Route::get('/penilaian', [PenilaianController::class, 'index'])->name('penilaian.index');
+Route::get('/periode-pegawai', [PeriodePegawaiController::class, 'index'])->name('periode-pegawai.index');
+Route::get('/periode-pegawai/data', [PeriodePegawaiController::class, 'getData']);
+Route::post('/periode-pegawai/store', [PeriodePegawaiController::class, 'store']);
+Route::post('/periode-pegawai/update/{id}', [PeriodePegawaiController::class, 'update']);
+Route::post('/periode-pegawai/delete/{id}', [PeriodePegawaiController::class, 'delete']);

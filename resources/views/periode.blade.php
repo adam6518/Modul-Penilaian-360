@@ -153,10 +153,10 @@
         }
 
         function renderTable(data) {
-            let rows = "";
+            let html = "";
 
             data.forEach((item, index) => {
-                rows += `
+                html += `
         <tr>
             <td>${index + 1}</td>
             <td>${item.nama_periode}</td>
@@ -184,7 +184,7 @@
         `;
             });
 
-            $("#periodeTableBody").html(rows);
+            $("#periodeTableBody").html(html);
         }
 
         $(document).ready(function() {

@@ -75,39 +75,39 @@
                             <th>
                                 <div class="d-flex flex-column flex-lg-row gap-2">
                                     <input type="text" class="form-control form-control-sm" placeholder="Cari ID Periode"
-                                        data-col="1">
+                                        data-field="id_periode">
                                 </div>
                             </th>
 
                             <th>
                                 <div class="d-flex flex-column flex-lg-row gap-2">
                                     <input type="text" class="form-control form-control-sm" placeholder="Cari ID Atasan"
-                                        data-col="2">
+                                        data-field="id_atasan">
                                 </div>
                             </th>
 
                             <th>
                                 <div class="d-flex flex-column flex-lg-row gap-2">
                                     <input type="text" class="form-control form-control-sm"
-                                        placeholder="Cari Nama Pegawai" data-col="3">
+                                        placeholder="Cari Nama Pegawai" data-field="nama_pegawai">
                                 </div>
                             </th>
                             <th>
                                 <div class="d-flex flex-column flex-lg-row gap-2">
                                     <input type="text" class="form-control form-control-sm" placeholder="Cari NIP"
-                                        data-col="3">
+                                        data-field="nip">
                                 </div>
                             </th>
                             <th>
                                 <div class="d-flex flex-column flex-lg-row gap-2">
                                     <input type="text" class="form-control form-control-sm" placeholder="Cari ID Pegawai"
-                                        data-col="3">
+                                        data-field="id_pegawai">
                                 </div>
                             </th>
                             <th>
                                 <div class="d-flex flex-column flex-lg-row gap-2">
                                     <input type="text" class="form-control form-control-sm" placeholder="Cari ID Satker"
-                                        data-col="3">
+                                        data-field="id_satker">
                                 </div>
                             </th>
                             <th>
@@ -138,6 +138,10 @@
     </script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
+        // State untuk menyimpan hasil all data
+        let periodePegawaiData = []
+
+        // Fungsi untuk menampilkan list periode saat klik tombol "Tambah Periode"
         function loadPeriode() {
             fetch('/periode/list')
                 .then(res => res.json())
@@ -162,47 +166,26 @@
             document.getElementById('btnPeriode').innerText = nama;
         }
 
+        // Fungsi memanggil all data periode pegawai
         function loadData() {
-            fetch('https://api.jsonbin.io/v3/qs/694a1a7c43b1c97be9ffd42c')
-                .then(res => res.json())
-                .then(res => {
-                    const data = res.record; // ⬅️ INI KUNCI UTAMA
+            $.ajax({
+                url: "https://api.jsonbin.io/v3/b/6954850a43b1c97be90f7a7b",
+                type: "GET",
+                success: function(res) {
+                    let data = []
 
-                    let html = '';
-                    let no = 1;
-
-                    if (!Array.isArray(data) || data.length === 0) {
-                        html = `
-                    <tr>
-                        <td colspan="8" class="text-center text-muted">
-                            Data tidak tersedia
-                        </td>
-                    </tr>
-                `;
-                    } else {
-                        data.forEach(row => {
-                            html += `
-                        <tr>
-                            <td class="text-center">${no++}</td>
-                            <td class="text-center">${row.id_periode}</td>
-                            <td class="text-center">${row.id_atasan}</td>
-                            <td class="text-center">${row.nama_pegawai}</td>
-                            <td class="text-center">${row.nip}</td>
-                            <td class="text-center">${row.id_pegawai}</td>
-                            <td class="text-center">${row.id_satker}</td>
-                            <td class="text-center d-flex">
-                                <button class="btn btn-sm btn-primary mx-2" onclick="edit(${row.id})">Edit</button>
-                                <button class="btn btn-sm btn-danger" onclick="hapus(${row.id})">Hapus</button>
-                            </td>
-                        </tr>
-                    `;
-                        });
+                    if (Array.isArray(res.record)) {
+                        // JSONBin record langsung array
+                        data = res.record
+                    } else if (Array.isArray(res.record?.data)) {
+                        // JSONBin record punya property data
+                        data = res.record.data
                     }
 
-                    document.getElementById('periodePegawaiTableBody').innerHTML = html;
-                })
-                .catch(err => {
-                    console.error('API ERROR:', err);
+                    periodePegawaiData = data
+                    renderTable(data)
+                },
+                error: function(err) {
                     document.getElementById('periodePegawaiTableBody').innerHTML = `
                 <tr>
                     <td colspan="8" class="text-center text-danger">
@@ -210,11 +193,48 @@
                     </td>
                 </tr>
             `;
-                });
+                }
+            })
         }
 
-        document.addEventListener('DOMContentLoaded', loadData);
+        // Fungsi memunculkan tabel periode pegawai    
+        function renderTable(data) {
+            let html = '';
 
+            if (!Array.isArray(data)) data = []
+
+            if (!data.length) {
+                html = `
+            <tr>
+                <td colspan="8" class="text-center text-muted">
+                    Data tidak tersedia
+                </td>
+            </tr>
+        `;
+            } else {
+                data.forEach((item, index) => {
+                    html += `
+                        <tr>
+                            <td class="text-center">${index + 1}</td>
+                            <td class="text-center">${item.id_periode}</td>
+                            <td class="text-center">${item.id_atasan}</td>
+                            <td class="text-center">${item.nama_pegawai}</td>
+                            <td class="text-center">${item.nip}</td>
+                            <td class="text-center">${item.id_pegawai}</td>
+                            <td class="text-center">${item.id_satker}</td>
+                            <td class="text-center d-flex">
+                                <button class="btn btn-sm btn-primary mx-2" onclick="edit(${item.id})">Edit</button>
+                                <button class="btn btn-sm btn-danger" onclick="hapus(${item.id})">Hapus</button>
+                            </td>
+                        </tr>
+            `;
+                });
+            }
+
+            $('#periodePegawaiTableBody').html(html);
+        }
+
+        // Fungsi untuk hapus data
         function hapus(id) {
             fetch(`/periode-pegawai/delete/${id}`, {
                 method: 'POST',
@@ -224,6 +244,30 @@
             }).then(() => loadData());
         }
 
-        document.addEventListener('DOMContentLoaded', loadData);
+        $(document).ready(function() {
+            loadData() // initial load
+
+            //Search
+            $('thead input').on('keyup change', function() {
+                let filtered = periodePegawaiData
+
+                $('thead input').each(function() {
+                    const keyword = $(this).val().toLowerCase()
+                    const field = $(this).data('field')
+
+                    if (keyword) {
+                        filtered = filtered.filter(item => {
+                            return (item[field] ?? '')
+                                .toString()
+                                .toLowerCase()
+                                .includes(keyword)
+                        })
+                    }
+                })
+
+                renderTable(filtered)
+            })
+
+        })
     </script>
 @endsection

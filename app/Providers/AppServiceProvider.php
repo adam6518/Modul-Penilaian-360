@@ -3,6 +3,9 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use App\Repositories\PeriodePegawai\PeriodePegawaiRepositoryInterface;
+use App\Repositories\PeriodePegawai\PeriodePegawaiRepository;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -11,7 +14,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(
+            PeriodePegawaiRepositoryInterface::class,
+            PeriodePegawaiRepository::class
+        );
     }
 
     /**

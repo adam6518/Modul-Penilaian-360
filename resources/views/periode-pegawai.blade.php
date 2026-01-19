@@ -11,9 +11,22 @@
 @section('content')
     <h1 class="fw-bold mb-4">Periode Pegawai</h1>
 
-    {{-- Button Tambah --}}
-    <div class="mb-3">
-        <button id="btnTambah" class="btn btn-success btn-sm">Tambah Periode Pegawai</button>
+    <div class="d-flex gap-5">
+        {{-- Button Pilih Periode --}}
+        <div class="mb-3">
+            <button id="btnTampil" class="btn btn-secondary btn-sm w-sm">Tampilkan Periode Pegawai</button>
+        </div>
+        {{-- Button Hapus Periode --}}
+        <div class="mb-3">
+            <button id="btnDeletePeriode" class="btn btn-danger btn-sm" type="button">
+                Hapus Semua Data Periode Ini
+            </button>
+        </div>
+
+        {{-- Button Tambah Periode --}}
+        <div class="mb-3">
+            <button id="btnTambah" class="btn btn-success btn-sm w-sm">Tambah Periode Pegawai</button>
+        </div>
     </div>
 
     {{-- Hidden Form --}}
@@ -22,13 +35,13 @@
             <div class="row g-3">
                 <input type="hidden" id="nama_periode">
                 <div class="col-md-4">
-                    <button id="btnPeriode" class="btn dropdown-toggle btn-l border border-black border-2 text-start w-50"
+                    <button id="btnPeriode"
+                        class="btn dropdown-toggle btn-sm border border-black border-2 text-start w-75 text-center"
                         type="button" data-bs-toggle="dropdown">
                         -- Pilih Periode --
                     </button>
 
-                    <ul class="dropdown-menu border border-black text-start" id="periodeDropdown">
-                        {{--  <li><a class="dropdown-item">Action</a></li>  --}}
+                    <ul class="dropdown-menu border border-black text-start w-25" id="periodeDropdown">
                     </ul>
                 </div>
                 <div class="d-flex justify-content-end gap-2 mt-3">

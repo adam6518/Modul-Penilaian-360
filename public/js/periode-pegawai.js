@@ -2,11 +2,21 @@ document.addEventListener("DOMContentLoaded", function () {
     const btnTambah = document.getElementById("btnTambah");
     const btnBatal = document.getElementById("btnBatal");
     const formTambah = document.getElementById("formTambah");
+    const btnTampil = document.getElementById("btnTampil");
 
     if (btnTambah) {
         btnTambah.addEventListener("click", function () {
             formTambah.classList.remove("d-none");
             btnTambah.classList.add("d-none");
+            btnTampil.classList.add("d-none");
+        });
+    }
+
+    if (btnTampil) {
+        btnTampil.addEventListener("click", function () {
+            formTambah.classList.remove("d-none");
+            btnTambah.classList.add("d-none");
+            btnTampil.classList.add("d-none");
             loadPeriode();
         });
     }
@@ -17,48 +27,38 @@ document.addEventListener("DOMContentLoaded", function () {
             btnTambah.classList.remove("d-none");
         });
     }
-
-    loadData();
 });
 
-// State untuk menyimpan hasil all data
+let selectedPeriode = null;
 let periodePegawaiData = [];
 
-// State untuk menyimpan id periode yang dipilih
-let selectedPeriode = null;
+/* ===============================
+   CSRF SETUP
+================================ */
+$.ajaxSetup({
+    headers: {
+        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+    },
+});
 
-// Fungsi untuk menampilkan list periode saat klik tombol "Tambah Periode"
-// function loadPeriode() {
-//     fetch("/periode/list")
-//         .then((res) => res.json())
-//         .then((data) => {
-//             let list = '<li><a class="dropdown-item"></a></li>';
-//             data.forEach((p) => {
-//                 list += `<li>
-//                         <a href="#"
-//                            class="dropdown-item"
-//                            onclick="selectPeriode(${p.id}, '${p.nama_periode}')">
-//                            ${p.nama_periode}
-//                         </a>
-//                     </li>`;
-//                 // {{--  option += `<option value="${p.id}">${p.nama_periode}</option>`;  --}};
-//             });
-//             document.getElementById("periodeDropdown").innerHTML = list;
-//         });
-// }
+/* ===============================
+   LOAD PERIODE (DROPDOWN)
+================================ */
 function loadPeriode() {
     $.ajax({
-        url: "/periode/data",
+        url: "/periode-pegawai/list",
         method: "GET",
+        dataType: "json",
         success: function (data) {
             let html = "";
 
-            if (!Array.isArray(data) || data.length === 0) {
-                html = `<li>
-                    <span class="dropdown-item text-muted">
-                        Tidak ada periode
-                    </span>
-                </li>`;
+            if (!data.length) {
+                html = `
+                    <li>
+                        <span class="dropdown-item text-muted">
+                            Tidak ada periode
+                        </span>
+                    </li>`;
             } else {
                 data.forEach((p) => {
                     html += `
@@ -68,8 +68,7 @@ function loadPeriode() {
                                onclick="selectPeriode(${p.id}, '${p.nama_periode}')">
                                 ${p.nama_periode}
                             </a>
-                        </li>
-                    `;
+                        </li>`;
                 });
             }
 
@@ -81,93 +80,63 @@ function loadPeriode() {
                     <span class="dropdown-item text-danger">
                         Gagal memuat periode
                     </span>
-                </li>
-            `);
+                </li>`);
         },
     });
 }
 
-// function selectPeriode(id, nama) {
-//     document.getElementById("periode_id").value = id;
-//     document.getElementById("btnPeriode").innerText = nama;
-// }
-
+/* ===============================
+   PILIH PERIODE
+================================ */
 function selectPeriode(id, nama) {
     selectedPeriode = id;
     $("#btnPeriode").text(nama);
-    $("#btnSimpan").on("click", function () {
-        if (!selectedPeriode) {
-            alert("Silakan pilih periode terlebih dahulu");
-            return;
-        }
+}
 
-        loadData(selectedPeriode);
+/* ===============================
+   IMPORT JSON → DB
+================================ */
+function importData() {
+    if (!selectedPeriode) {
+        alert("Pilih periode terlebih dahulu");
+        return;
+    }
 
-        // tutup form
-        $("#formTambah").addClass("d-none");
-        $("#btnTambah").removeClass("d-none");
+    $.ajax({
+        url: "/periode-pegawai/import",
+        method: "POST",
+        data: {
+            periode_id: selectedPeriode,
+        },
+        success: function () {
+            alert("Data berhasil ditambahkan ke database");
+        },
+        error: function (xhr) {
+            console.error(xhr.responseText);
+            alert("Gagal menambahkan data");
+        },
     });
 }
 
-// Fungsi memanggil all data periode pegawai
-// function loadData() {
-//     $.ajax({
-//         url: "https://api.jsonbin.io/v3/b/6954850a43b1c97be90f7a7b",
-//         type: "GET",
-//         success: function (res) {
-//             let data = [];
+/* ===============================
+   LOAD DATA DARI DB
+================================ */
+function loadFromDb() {
+    if (!selectedPeriode) {
+        alert("Pilih periode terlebih dahulu");
+        return;
+    }
 
-//             if (Array.isArray(res.record)) {
-//                 // JSONBin record langsung array
-//                 data = res.record;
-//             } else if (Array.isArray(res.record?.data)) {
-//                 // JSONBin record punya property data
-//                 data = res.record.data;
-//             }
-
-//             periodePegawaiData = data;
-//             renderTable(data);
-//         },
-//         error: function (err) {
-//             document.getElementById("periodePegawaiTableBody").innerHTML = `
-//                 <tr>
-//                     <td colspan="8" class="text-center text-danger">
-//                         Gagal memuat data
-//                     </td>
-//                 </tr>
-//             `;
-//         },
-//     });
-// }
-function loadData(periodeId) {
-    // $.ajax({
-    //     url: "/periode-pegawai/data",
-    //     method: "GET",
-    //     data: { periode_id: periodeId },
-    //     success: function (data) {
-    //         periodePegawaiData = data;
-    //         renderTable(data);
-    //     },
-    // });
     $.ajax({
-        url: "https://api.jsonbin.io/v3/b/6954850a43b1c97be90f7a7b",
+        url: "/periode-pegawai/show",
         method: "GET",
-        success: function (res) {
-            let data = [];
-
-            if (Array.isArray(res.record?.data)) {
-                data = res.record.data;
-            } else if (Array.isArray(res.record)) {
-                data = res.record;
-            }
-
-            // FILTER BERDASARKAN ID PERIODE
-            const filtered = data.filter(
-                (item) => Number(item.id_periode) === Number(periodeId)
-            );
-
-            periodePegawaiData = filtered;
-            renderTable(filtered);
+        data: {
+            periode_id: selectedPeriode,
+        },
+        dataType: "json",
+        success: function (data) {
+            periodePegawaiData = data;
+            renderTable(data);
         },
         error: function () {
             renderTable([]);
@@ -175,11 +144,40 @@ function loadData(periodeId) {
     });
 }
 
-// Fungsi memunculkan tabel periode pegawai
+/* ===============================
+   HAPUS DATA DARI DB
+================================ */
+function hapusData(id) {
+    if (!confirm("Yakin ingin menghapus data ini?")) {
+        return;
+    }
+
+    $.ajax({
+        url: `/periode-pegawai/delete/${id}`,
+        type: "DELETE",
+        data: {
+            _token: $('meta[name="csrf-token"]').attr("content"),
+        },
+        success: function () {
+            alert("Data berhasil dihapus");
+
+            // reload table
+            if (selectedPeriode) {
+                tampilkanData(selectedPeriode);
+            }
+        },
+        error: function (xhr) {
+            console.error(xhr.responseText);
+            alert("Gagal menghapus data");
+        },
+    });
+}
+
+/* ===============================
+   RENDER TABLE
+================================ */
 function renderTable(data) {
     let html = "";
-
-    if (!Array.isArray(data)) data = [];
 
     if (!data.length) {
         html = `
@@ -187,66 +185,87 @@ function renderTable(data) {
                 <td colspan="8" class="text-center text-muted">
                     Data tidak tersedia
                 </td>
-            </tr>
-        `;
+            </tr>`;
     } else {
         data.forEach((item, index) => {
             html += `
-                        <tr>
-                            <td class="text-center">${index + 1}</td>
-                            <td class="text-center">${item.id_periode}</td>
-                            <td class="text-center">${item.id_atasan}</td>
-                            <td class="text-center">${item.nama_pegawai}</td>
-                            <td class="text-center">${item.nip}</td>
-                            <td class="text-center">${item.id_pegawai}</td>
-                            <td class="text-center">${item.id_satker}</td>
-                            <td class="text-center d-flex">
-                                <button class="btn btn-sm btn-primary mx-2" onclick="edit(${
-                                    item.id
-                                })">Edit</button>
-                                <button class="btn btn-sm btn-danger" onclick="hapus(${
-                                    item.id
-                                })">Hapus</button>
-                            </td>
-                        </tr>
-            `;
+                <tr>
+                    <td class="text-center">${index + 1}</td>
+                    <td class="text-center">${item.id_periode}</td>
+                    <td class="text-center">${item.id_atasan}</td>
+                    <td>${item.nama_pegawai}</td>
+                    <td>${item.nip}</td>
+                    <td>${item.id_pegawai}</td>
+                    <td>${item.id_satker}</td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-danger" onClick="hapusData(${
+                            item.id
+                        })">
+                            Hapus
+                        </button>
+                    </td>
+                </tr>`;
         });
     }
 
     $("#periodePegawaiTableBody").html(html);
 }
 
-// Fungsi untuk hapus data
-function hapus(id) {
-    fetch(`/periode-pegawai/delete/${id}`, {
-        method: "POST",
-        headers: {
-            "X-CSRF-TOKEN": "{{ csrf_token() }}",
-        },
-    }).then(() => loadData());
-}
-
+/* ===============================
+   BUTTON HANDLER
+================================ */
 $(document).ready(function () {
-    loadData(); // initial load
+    // MODE TAMBAH
+    $("#btnTambah").on("click", function () {
+        loadPeriode();
 
-    //Search
-    $("thead input").on("keyup change", function () {
-        let filtered = periodePegawaiData;
+        $("#btnSimpan").text("Tambah").off("click").on("click", importData);
 
-        $("thead input").each(function () {
-            const keyword = $(this).val().toLowerCase();
-            const field = $(this).data("field");
+        $("#formTambah").removeClass("d-none");
+    });
 
-            if (keyword) {
-                filtered = filtered.filter((item) => {
-                    return (item[field] ?? "")
-                        .toString()
-                        .toLowerCase()
-                        .includes(keyword);
-                });
-            }
+    // MODE TAMPIL
+    $("#btnTampil").on("click", function () {
+        loadPeriode();
+
+        $("#btnSimpan").text("Tampilkan").off("click").on("click", loadFromDb);
+
+        $("#formTambah").removeClass("d-none");
+    });
+
+    // DELETE ALL PERIODE
+    $("#btnDeletePeriode").on("click", function () {
+        if (!selectedPeriode) {
+            alert("Silakan pilih periode terlebih dahulu");
+            return;
+        }
+
+        if (!confirm("Yakin hapus semua data periode ini?")) {
+            return;
+        }
+
+        $.ajax({
+            url: "/periode-pegawai/delete-periode",
+            method: "POST",
+            data: {
+                periode_id: selectedPeriode,
+                _token: $('meta[name="csrf-token"]').attr("content"),
+            },
+            success: function () {
+                alert("Data periode berhasil dihapus");
+                renderTable([]);
+            },
+            error: function (xhr) {
+                alert("Gagal menghapus data periode");
+                console.error(xhr.responseText);
+            },
         });
+    });
 
-        renderTable(filtered);
+    // BATAL
+    $("#btnBatal").on("click", function () {
+        selectedPeriode = null;
+        $("#btnPeriode").text("-- Pilih Periode --");
+        $("#formTambah").addClass("d-none");
     });
 });

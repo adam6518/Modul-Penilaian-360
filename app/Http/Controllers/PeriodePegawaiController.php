@@ -3,145 +3,224 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-use App\UseCases\PeriodePegawai\{
-    GetPeriodePegawaiUseCase,
-    CreatePeriodePegawaiUseCase,
-    UpdatePeriodePegawaiUseCase,
-    DeletePeriodePegawaiUseCase
-};
+use Illuminate\Support\Facades\DB;
+// use Illuminate\Support\Facades\Http;
 
 class PeriodePegawaiController extends Controller
 {
-    public function index(GetPeriodePegawaiUseCase $useCase)
+    // Data dummy Periode Pegawai 
+    private array $dataPeriodePegawai = [
+        "record" => [
+            "data" => [
+                [
+                    "id" => 1,
+                    "id_periode" => 11,
+                    "id_atasan" => null,
+                    "nama_pegawai" => "Atasan 1",
+                    "nip" => "2440086703",
+                    "id_pegawai" => 12,
+                    "id_satker" => 13,
+                    "status" => 1
+                ],
+                [
+                    "id" => 2,
+                    "id_periode" => 11,
+                    "id_atasan" => null,
+                    "nama_pegawai" => "Atasan 2",
+                    "nip" => "2440086704",
+                    "id_pegawai" => 13,
+                    "id_satker" => 14,
+                    "status" => 1
+                ],
+                [
+                    "id" => 3,
+                    "id_periode" => 11,
+                    "id_atasan" => 12,
+                    "nama_pegawai" => "Bawahan A1 A",
+                    "nip" => "2440086705",
+                    "id_pegawai" => 14,
+                    "id_satker" => 13,
+                    "status" => 1
+                ],
+                [
+                    "id" => 4,
+                    "id_periode" => 11,
+                    "id_atasan" => 12,
+                    "nama_pegawai" => "Bawahan A1 B",
+                    "nip" => "2440086706",
+                    "id_pegawai" => 15,
+                    "id_satker" => 13,
+                    "status" => 1
+                ],
+                [
+                    "id" => 5,
+                    "id_periode" => 11,
+                    "id_atasan" => 12,
+                    "nama_pegawai" => "Bawahan A1 C",
+                    "nip" => "2440086707",
+                    "id_pegawai" => 16,
+                    "id_satker" => 13,
+                    "status" => 1
+                ],
+                [
+                    "id" => 6,
+                    "id_periode" => 11,
+                    "id_atasan" => 12,
+                    "nama_pegawai" => "Bawahan A1 D",
+                    "nip" => "2440086708",
+                    "id_pegawai" => 17,
+                    "id_satker" => 13,
+                    "status" => 1
+                ],
+                [
+                    "id" => 7,
+                    "id_periode" => 11,
+                    "id_atasan" => 13,
+                    "nama_pegawai" => "Bawahan A2 A",
+                    "nip" => "2440086709",
+                    "id_pegawai" => 18,
+                    "id_satker" => 14,
+                    "status" => 1
+                ],
+                [
+                    "id" => 8,
+                    "id_periode" => 11,
+                    "id_atasan" => 13,
+                    "nama_pegawai" => "Bawahan A2 B",
+                    "nip" => "2440086710",
+                    "id_pegawai" => 19,
+                    "id_satker" => 14,
+                    "status" => 1
+                ],
+                [
+                    "id" => 9,
+                    "id_periode" => 11,
+                    "id_atasan" => 13,
+                    "nama_pegawai" => "Bawahan A2 B",
+                    "nip" => "2440086711",
+                    "id_pegawai" => 19,
+                    "id_satker" => 14,
+                    "status" => 1
+                ],
+                [
+                    "id" => 10,
+                    "id_periode" => 11,
+                    "id_atasan" => 13,
+                    "nama_pegawai" => "Bawahan A2 C",
+                    "nip" => "2440086712",
+                    "id_pegawai" => 20,
+                    "id_satker" => 14,
+                    "status" => 1
+                ],
+                [
+                    "id" => 11,
+                    "id_periode" => 11,
+                    "id_atasan" => 13,
+                    "nama_pegawai" => "Bawahan A2 D",
+                    "nip" => "2440086713",
+                    "id_pegawai" => 21,
+                    "id_satker" => 14,
+                    "status" => 1
+                ],
+            ]
+        ]
+    ];
+
+    // LOAD PAGE
+    public function index()
     {
-        // return view('periode-pegawai', [
-        //     'periodePegawai' => $useCase->execute()
-        // ]);
         return view('periode-pegawai');
     }
-    public function getData(
-        Request $request,
-        GetPeriodePegawaiUseCase $useCase
-    ) {
-        $periodeId = $request->query('periode_id');
-        // return response()->json(
-        //     $useCase->execute((int) $request->periode_id)
-        // );
-        return response()->json(
-            $useCase->execute($periodeId)
-        );
+
+    // AMBIL PERIODE DARI DB (UNTUK DROPDOWN)
+    public function getPeriodeList()
+    {
+        $periode = DB::select("
+            SELECT id, nama_periode
+            FROM periode
+            WHERE status != 9
+            ORDER BY id DESC
+        ");
+
+        return response()->json($periode);
     }
 
-    public function store(
-        Request $request,
-        CreatePeriodePegawaiUseCase $useCase
-    ) {
-    //    die('test'); 
-        return response()->json(
-            $useCase->execute($request->all()),
-            201
-        );
-    }
+    // Import dari JSON ke DB
+    public function importFromJson(Request $request)
+    {
+        $periodeId = $request->periode_id;
 
-    public function update(
-        int $id,
-        Request $request,
-        UpdatePeriodePegawaiUseCase $useCase
-    ) {
-        return response()->json(
-            $useCase->execute($id, $request->all())
-        );
-    }
+        $data = $this->dataPeriodePegawai['record']['data'];
 
-    public function delete(
-        int $id,
-        DeletePeriodePegawaiUseCase $useCase
-    ) {
-        $useCase->execute($id);
+        $filtered = array_filter(
+            $data,
+            fn($row) => (int) $row['id_periode'] === $periodeId
+        );
+
+        foreach ($filtered as $row) {
+            DB::insert("
+                INSERT INTO periode_pegawai
+                (id_periode, id_atasan, nama_pegawai, nip, id_pegawai, id_satker, status)
+                VALUES (?, ?, ?, ?, ?, ?, 1)
+            ", [
+                $row['id_periode'],
+                $row['id_atasan'] ?? 0,
+                $row['nama_pegawai'],
+                $row['nip'],
+                $row['id_pegawai'],
+                $row['id_satker'],
+            ]);
+        }
+
         return response()->json(['success' => true]);
     }
+
+    // Tampilkan data dari DB
+    public function showByPeriode(Request $request)
+    {
+        return DB::select("
+            SELECT *
+            FROM periode_pegawai
+            WHERE id_periode = ?
+            AND status = 1
+        ", [$request->periode_id]);
+    }
+
+    // Hapus data periode pegawai per row
+    public function destroy($id)
+    {
+        DB::update("
+        UPDATE periode_pegawai
+        SET status = 9
+        WHERE id = ?
+    ", [$id]);
+
+        return response()->json([
+            'success' => true
+        ]);
+    }
+
+    // Hapus data by periode
+    public function destroyByPeriode(Request $request)
+    {
+        $periodeId = $request->periode_id;
+
+        if (! $periodeId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Periode tidak valid'
+            ], 422);
+        }
+
+        DB::update("
+        UPDATE periode_pegawai
+        SET status = 9
+        WHERE id_periode = ?
+        AND status = 1
+    ", [$periodeId]);
+
+        return response()->json([
+            'success' => true
+        ]);
+    }
 }
-
-
-// namespace App\Http\Controllers;
-
-// use Illuminate\Http\Request;
-// use Illuminate\Support\Facades\Validator;
-// use App\Models\PeriodePegawai;
-
-// class PeriodePegawaiController extends Controller
-// {
-//     public function index()
-//     {
-//         return view('periode-pegawai');
-//     }
-
-//     public function getData()
-//     {
-//         return response()->json(
-//             PeriodePegawai::where('status', '!=', 9)->get()
-//         );
-//     }
-
-//     public function store(Request $request)
-//     {
-//         $validator = Validator::make($request->all(), [
-//             'id_periode'   => 'required|integer',
-//             'id_atasan'    => 'required|integer',
-//             'id_pegawai'   => 'required|integer',
-//             'nama_pegawai' => 'required|string',
-//             'nip'          => 'required|string'
-//         ]);
-
-//         if ($validator->fails()) {
-//             return response()->json([
-//                 'errors' => $validator->errors()
-//             ], 422);
-//         }
-
-//         $data = $validator->validated();
-//         $data['status'] = 1;
-
-//         $periodePegawai = PeriodePegawai::create($data);
-
-//         return response()->json($periodePegawai, 200);
-//     }
-
-//     public function update(Request $request, $id)
-//     {
-//         $validator = Validator::make($request->all(), [
-//             'id_periode'   => 'required|integer',
-//             'id_atasan'    => 'required|integer',
-//             'id_pegawai'   => 'required|integer',
-//             'nama_pegawai' => 'required|string',
-//             'nip'          => 'required|string'
-//         ]);
-
-//         if ($validator->fails()) {
-//             return response()->json([
-//                 'errors' => $validator->errors()
-//             ], 422);
-//         }
-
-//         $periodePegawai = PeriodePegawai::findOrFail($id);
-//         $periodePegawai->update($validator->validated());
-
-//         return response()->json($periodePegawai, 200);
-//     }
-
-//     public function delete($id)
-//     {
-//         $periodePegawai = PeriodePegawai::findOrFail($id);
-
-//         if ($periodePegawai->status != 1) {
-//             return response()->json([
-//                 'message' => 'Data tidak bisa dihapus'
-//             ], 422);
-//         }
-
-//         $periodePegawai->update(['status' => 9]);
-
-//         return response()->json(['success' => true]);
-//     }
-// }

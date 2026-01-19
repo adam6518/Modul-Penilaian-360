@@ -29,7 +29,19 @@ Route::post('/referensi/update/{id}', [ReferensiController::class, 'update']);
 Route::delete('/referensi/delete/{id}', [ReferensiController::class, 'delete']);
 
 Route::get('/periode-pegawai', [PeriodePegawaiController::class, 'index'])->name('periode-pegawai.index');
-Route::get('/periode-pegawai/data', [PeriodePegawaiController::class, 'getData'])->name('periode-pegawat.data');
-Route::post('/periode-pegawai/store', [PeriodePegawaiController::class, 'store']);
-Route::post('/periode-pegawai/update/{id}', [PeriodePegawaiController::class, 'update']);
-Route::post('/periode-pegawai/delete/{id}', [PeriodePegawaiController::class, 'delete']);
+Route::get('/periode-pegawai/list', [PeriodePegawaiController::class, 'getPeriodeList']);
+Route::get('/periode-pegawai/data', [PeriodePegawaiController::class, 'getData']);
+// PROSES 1: SIMPAN DARI JSON KE DB
+Route::post('/periode-pegawai/import', [PeriodePegawaiController::class, 'importFromJson']);
+
+// PROSES 2: TAMPILKAN DARI DB
+Route::get('/periode-pegawai/show', [PeriodePegawaiController::class, 'showByPeriode']);
+Route::delete('/periode-pegawai/delete/{id}', [PeriodePegawaiController::class, 'destroy']);
+// BULK DELETE PER PERIODE
+Route::post(
+    '/periode-pegawai/delete-periode',
+    [PeriodePegawaiController::class, 'destroyByPeriode']
+);
+// Route::post('/periode-pegawai/store', [PeriodePegawaiController::class, 'store']);
+// Route::post('/periode-pegawai/update/{id}', [PeriodePegawaiController::class, 'update']);
+// Route::post('/periode-pegawai/delete/{id}', [PeriodePegawaiController::class, 'delete']);

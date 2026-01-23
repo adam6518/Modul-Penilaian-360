@@ -1,36 +1,25 @@
 document.addEventListener("DOMContentLoaded", function () {
     const btnTambah = document.getElementById("btnTambah");
-    const btnBatal = document.getElementById("btnBatal");
     const formTambah = document.getElementById("formTambah");
     const btnTampil = document.getElementById("btnTampil");
 
     if (btnTambah) {
         btnTambah.addEventListener("click", function () {
             formTambah.classList.remove("d-none");
-            btnTambah.classList.add("d-none");
-            btnTampil.classList.add("d-none");
         });
     }
 
     if (btnTampil) {
         btnTampil.addEventListener("click", function () {
-            formTambah.classList.remove("d-none");
-            btnTambah.classList.add("d-none");
-            btnTampil.classList.add("d-none");
             loadPeriode();
-        });
-    }
-
-    if (btnBatal) {
-        btnBatal.addEventListener("click", function () {
-            formTambah.classList.add("d-none");
-            btnTambah.classList.remove("d-none");
         });
     }
 });
 
 let selectedPeriode = null;
 let periodePegawaiData = [];
+let periodeAktif = false;
+let selectedPeriodeModal = null;
 
 /* ===============================
    CSRF SETUP
@@ -86,11 +75,72 @@ function loadPeriode() {
 }
 
 /* ===============================
+   PILIH DROPDOWN PERIODE MODAL
+================================ */
+function loadPeriodeForModal() {
+    $.ajax({
+        url: "/periode-pegawai/list",
+        method: "GET",
+        dataType: "json",
+        success: function (data) {
+            let html = "";
+
+            if (!data.length) {
+                html = `<li><span class="dropdown-item text-muted">Tidak ada periode</span></li>`;
+            } else {
+                data.forEach((p) => {
+                    html += `
+                        <li>
+                            <a href="#"
+                               class="dropdown-item"
+                               onclick="selectPeriodeModal(${p.id}, '${p.nama_periode}')">
+                                ${p.nama_periode}
+                            </a>
+                        </li>`;
+                });
+            }
+
+            $("#modalPeriodeDropdown").html(html);
+        },
+    });
+}
+
+/* ===============================
    PILIH PERIODE
 ================================ */
 function selectPeriode(id, nama) {
     selectedPeriode = id;
+    periodeAktif = false;
     $("#btnPeriode").text(nama);
+
+    // sembunyikan action sampai data ditampilkan
+    $("#btnSync").addClass("d-none");
+    $("#btnDeletePeriode").addClass("d-none");
+}
+
+/* ===============================
+   PILIH PERIODE MODAL
+================================ */
+function selectPeriodeModal(id, nama) {
+    selectedPeriodeModal = id;
+    $("#modalBtnPeriode").text(nama);
+}
+
+/* ===============================
+   CEK PERIODE EXISTS
+================================ */
+function checkPeriodeExists(periodeId, callback) {
+    $.ajax({
+        url: "/periode-pegawai/show",
+        method: "GET",
+        data: { periode_id: periodeId },
+        success: function (data) {
+            callback(data.length > 0);
+        },
+        error: function () {
+            callback(false);
+        },
+    });
 }
 
 /* ===============================
@@ -108,12 +158,13 @@ function importData() {
         data: {
             periode_id: selectedPeriode,
         },
-        success: function () {
-            alert("Data berhasil ditambahkan ke database");
+        success: function (res) {
+            alert(`Berhasil menambahkan ${res.inserted} data`);
+            loadFromDb();
         },
         error: function (xhr) {
-            console.error(xhr.responseText);
-            alert("Gagal menambahkan data");
+            const res = xhr.responseJSON;
+            alert(res?.message || "Gagal menambahkan data");
         },
     });
 }
@@ -137,6 +188,11 @@ function loadFromDb() {
         success: function (data) {
             periodePegawaiData = data;
             renderTable(data);
+
+            // === PERIODE RESMI AKTIF ===
+            periodeAktif = true;
+            $("#btnSync").removeClass("d-none");
+            $("#btnDeletePeriode").removeClass("d-none");
         },
         error: function () {
             renderTable([]);
@@ -160,7 +216,7 @@ function hapusData(id) {
         },
         success: function () {
             alert("Data berhasil dihapus");
-
+            loadFromDb();
             // reload table
             if (selectedPeriode) {
                 tampilkanData(selectedPeriode);
@@ -169,6 +225,43 @@ function hapusData(id) {
         error: function (xhr) {
             console.error(xhr.responseText);
             alert("Gagal menghapus data");
+        },
+    });
+}
+/* ===============================
+   SYNC TABLE
+================================ */
+function syncPeriodePegawai() {
+    if (!selectedPeriode) {
+        alert("Pilih periode terlebih dahulu");
+        return;
+    }
+
+    if (!confirm("Yakin ingin melakukan sync data periode pegawai?")) {
+        return;
+    }
+
+    $.ajax({
+        url: "/periode-pegawai/sync",
+        method: "POST",
+        data: {
+            periode_id: selectedPeriode,
+        },
+        success: function (res) {
+            alert(
+                `Sync berhasil\n` +
+                    `Tambah: ${res.summary.insert}\n` +
+                    `Update: ${res.summary.update}\n` +
+                    `Hapus: ${res.summary.delete}`,
+            );
+
+            // reload table setelah sync
+            loadFromDb();
+        },
+        error: function (xhr) {
+            const res = xhr.responseJSON;
+            alert(res?.message || "Sync gagal");
+            console.error(xhr.responseText);
         },
     });
 }
@@ -215,13 +308,62 @@ function renderTable(data) {
    BUTTON HANDLER
 ================================ */
 $(document).ready(function () {
+    loadPeriode();
     // MODE TAMBAH
     $("#btnTambah").on("click", function () {
-        loadPeriode();
+        selectedPeriodeModal = null;
+        $("#modalBtnPeriode").text("-- Pilih Periode --");
 
+        loadPeriodeForModal();
+
+        const modal = new bootstrap.Modal(
+            document.getElementById("modalTambahPeriodePegawai"),
+        );
+        modal.show();
         $("#btnSimpan").text("Tambah").off("click").on("click", importData);
 
         $("#formTambah").removeClass("d-none");
+    });
+
+    // SIMPAN DARI MODAL
+    $("#btnModalSimpan").on("click", function () {
+        if (!selectedPeriodeModal) {
+            alert("Pilih periode terlebih dahulu");
+            return;
+        }
+
+        checkPeriodeExists(selectedPeriodeModal, function (exists) {
+            const endpoint = exists
+                ? "/periode-pegawai/sync"
+                : "/periode-pegawai/import";
+
+            const actionLabel = exists ? "update (sync)" : "tambah";
+
+            $.ajax({
+                url: endpoint,
+                method: "POST",
+                data: {
+                    periode_id: selectedPeriodeModal,
+                },
+                success: function (res) {
+                    alert(
+                        exists
+                            ? `Sync berhasil\nTambah: ${res.summary.insert}\nUpdate: ${res.summary.update}\nHapus: ${res.summary.delete}`
+                            : `Berhasil menambahkan ${res.inserted} data`,
+                    );
+
+                    bootstrap.Modal.getInstance(
+                        document.getElementById("modalTambahPeriodePegawai"),
+                    ).hide();
+
+                    selectedPeriode = selectedPeriodeModal;
+                    loadFromDb();
+                },
+                error: function (xhr) {
+                    alert(xhr.responseJSON?.message || "Gagal memproses data");
+                },
+            });
+        });
     });
 
     // MODE TAMPIL
@@ -231,6 +373,7 @@ $(document).ready(function () {
         $("#btnSimpan").text("Tampilkan").off("click").on("click", loadFromDb);
 
         $("#formTambah").removeClass("d-none");
+        loadFromDb();
     });
 
     // DELETE ALL PERIODE
@@ -249,11 +392,17 @@ $(document).ready(function () {
             method: "POST",
             data: {
                 periode_id: selectedPeriode,
-                _token: $('meta[name="csrf-token"]').attr("content"),
+                // _token: $('meta[name="csrf-token"]').attr("content"),
             },
             success: function () {
                 alert("Data periode berhasil dihapus");
                 renderTable([]);
+                loadFromDb();
+
+                // reset state
+                periodeAktif = false;
+                $("#btnSync").addClass("d-none");
+                $("#btnDeletePeriode").addClass("d-none");
             },
             error: function (xhr) {
                 alert("Gagal menghapus data periode");
@@ -265,7 +414,16 @@ $(document).ready(function () {
     // BATAL
     $("#btnBatal").on("click", function () {
         selectedPeriode = null;
+        periodeAktif = false;
         $("#btnPeriode").text("-- Pilih Periode --");
+        $("#btnSync").addClass("d-none");
+        $("#btnDeletePeriode").addClass("d-none");
+
         $("#formTambah").addClass("d-none");
+    });
+
+    // SYNC
+    $("#btnSync").on("click", function () {
+        syncPeriodePegawai();
     });
 });

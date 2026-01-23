@@ -5,6 +5,7 @@ use App\Http\Controllers\PeriodeController;
 use App\Http\Controllers\ReferensiController;
 // use App\Http\Controllers\PenilaianController;
 use App\Http\Controllers\PeriodePegawaiController;
+use App\Http\Controllers\PenilaianAtasanController;
 
 Route::get('/', function () {
     return view('dashboard');
@@ -42,6 +43,10 @@ Route::post(
     '/periode-pegawai/delete-periode',
     [PeriodePegawaiController::class, 'destroyByPeriode']
 );
+Route::post('/periode-pegawai/sync', [PeriodePegawaiController::class, 'sync']);
+
+Route::get('/penilaian-atasan', [PenilaianAtasanController::class, 'index'])->name('penilaian-atasan.index');
+
 // Route::post('/periode-pegawai/store', [PeriodePegawaiController::class, 'store']);
 // Route::post('/periode-pegawai/update/{id}', [PeriodePegawaiController::class, 'update']);
 // Route::post('/periode-pegawai/delete/{id}', [PeriodePegawaiController::class, 'delete']);

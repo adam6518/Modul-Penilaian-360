@@ -3,25 +3,20 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PeriodeController;
 use App\Http\Controllers\ReferensiController;
-// use App\Http\Controllers\PenilaianController;
 use App\Http\Controllers\PeriodePegawaiController;
+use App\Http\Controllers\PenilaianBawahanController;
 use App\Http\Controllers\PenilaianAtasanController;
+use App\Http\Controllers\PenilaianSejawatController;
+use App\Http\Controllers\RekapPenilaianController;
+use App\Http\Controllers\DashboardController;
 
-Route::get('/', function () {
-    return view('dashboard');
-});
+Route::get('/', [DashboardController::class, 'index']);
 
 Route::get('/periode', [PeriodeController::class, 'index'])->name('periode.index');
 Route::get('/periode/data', [PeriodeController::class, 'getData'])->name('periode.data');
 Route::post('/periode/store', [PeriodeController::class, 'store'])->name('periode.store');
 Route::post('/periode/update/{id}', [PeriodeController::class, 'update'])->name('periode.update');
 Route::delete('/periode/delete/{id}', [PeriodeController::class, 'delete'])->name('periode.delete');
-// Route::get('/periode/list', [PeriodeController::class, 'getList']);
-
-// Route::get('/periode', [PeriodeController::class, 'index']);
-// Route::post('/periode', [PeriodeController::class, 'store']);
-// Route::put('/periode/{id}', [PeriodeController::class, 'update']);
-// Route::delete('/periode/{id}', [PeriodeController::class, 'delete']);
 
 Route::get('/referensi', [ReferensiController::class, 'index'])->name('referensi.index');
 Route::get('/referensi/data', [ReferensiController::class, 'getData']);
@@ -45,8 +40,41 @@ Route::post(
 );
 Route::post('/periode-pegawai/sync', [PeriodePegawaiController::class, 'sync']);
 
-Route::get('/penilaian-atasan', [PenilaianAtasanController::class, 'index'])->name('penilaian-atasan.index');
+Route::get('/penilaian-bawahan', [PenilaianBawahanController::class, 'index'])->name('penilaian-bawahan.index');
+Route::post('/penilaian-bawahan/store', [PenilaianBawahanController::class, 'store']);
+Route::get(
+    '/penilaian-bawahan/bawahan',
+    [PenilaianBawahanController::class, 'getBawahanByPeriode']
+);
 
-// Route::post('/periode-pegawai/store', [PeriodePegawaiController::class, 'store']);
-// Route::post('/periode-pegawai/update/{id}', [PeriodePegawaiController::class, 'update']);
-// Route::post('/periode-pegawai/delete/{id}', [PeriodePegawaiController::class, 'delete']);
+Route::get('/penilaian-atasan', [PenilaianAtasanController::class, 'index'])->name('penilaian-atasan.index');
+Route::post('/penilaian-atasan/store', [PenilaianAtasanController::class, 'store']);
+Route::get('/penilaian-atasan/atasan', [PenilaianAtasanController::class, 'getAtasanByPeriode']);
+
+Route::get('/penilaian-sejawat', [PenilaianSejawatController::class, 'index'])->name('penilaian-sejawat.index');
+Route::post('/penilaian-sejawat/store', [PenilaianSejawatController::class, 'store']);
+Route::get('/penilaian-sejawat/sejawat', [PenilaianSejawatController::class, 'getSejawatByPeriode']);
+
+// REKAP PENILAIAN
+Route::get('/rekap-penilaian', [RekapPenilaianController::class, 'index'])->name('rekap-penilaian.index');
+Route::get('/rekap-penilaian/data', [RekapPenilaianController::class, 'getPeriode']);
+
+// DETAIL PER PERIODE
+Route::get('/rekap-penilaian/{periodeId}/data', [RekapPenilaianController::class, 'getSatker'])->whereNumber('periodeId');
+Route::get('/rekap-penilaian/{periodeId}', [RekapPenilaianController::class, 'detail'])->whereNumber('periodeId');;
+
+// VIEW PEGAWAI PER SATKER
+Route::get(
+    '/rekap-penilaian/{periodeId}/satker/{satkerId}',
+    [RekapPenilaianController::class, 'viewPegawai']
+);
+Route::get(
+    '/rekap-penilaian/{periodeId}/satker/{satkerId}/data',
+    [RekapPenilaianController::class, 'getPegawai']
+);
+
+// KALKULASI (OPTIONAL – BUTTON ACTION)
+Route::post(
+    '/rekap-penilaian/{periodeId}/kalkulasi',
+    [RekapPenilaianController::class, 'kalkulasi']
+);

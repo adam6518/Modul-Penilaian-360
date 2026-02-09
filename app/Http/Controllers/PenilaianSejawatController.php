@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class PenilaianAtasanController extends Controller
+class PenilaianSejawatController extends Controller
 {
     // DUMMY USER LOGGED IN
     private array $userLoggedIn = [
@@ -16,7 +16,7 @@ class PenilaianAtasanController extends Controller
     // LOAD PAGE
     public function index()
     {
-        return view('penilaian-atasan', [
+        return view('penilaian-sejawat', [
             'userPenilai' => $this->userLoggedIn // Dikirim ke penilaian-atasan.blade.php di window.USER_PENILAI
         ]);
     }
@@ -118,8 +118,8 @@ class PenilaianAtasanController extends Controller
                     ($row['col_01'] ?? 0) * ($bobot['col_01'] / 100),
                     ($row['col_02'] ?? 0) * ($bobot['col_02'] / 100),
                     ($row['col_03'] ?? 0) * ($bobot['col_03'] / 100),
-                    ($row['col_04'] ?? 0) * ($bobot['col_04'] / 100),
-                    ($row['col_05'] ?? 0) * ($bobot['col_05'] / 100),
+                    ($row['col_04']  ?? 0) * ($bobot['col_04'] / 100),
+                    ($row['col_05']  ?? 0) * ($bobot['col_05'] / 100),
                     ($row['col_06'] ?? 0) * ($bobot['col_06'] / 100),
                     ($row['col_07'] ?? 0) * ($bobot['col_07'] / 100),
                 ]);
@@ -142,26 +142,32 @@ class PenilaianAtasanController extends Controller
         }
     }
 
-    // AMBIL DATA ATASAN
-    public function getAtasanByPeriode(Request $request)
+    // AMBIL DATA SEJAWAT
+    public function getSejawatByPeriode(Request $request)
     {
         $periodeId = $request->periode_id;
 
         return DB::select("
         SELECT
-            atasan.id_pegawai   AS id_atasan,
-            atasan.nama_pegawai AS nama_atasan
-        FROM periode_pegawai bawahan
-        JOIN periode_pegawai atasan
-          ON atasan.id_pegawai = bawahan.id_atasan
-         AND atasan.id_periode = bawahan.id_periode
-        WHERE bawahan.id_periode = ?
-          AND bawahan.id_pegawai = ?
-          AND bawahan.status = 1
-          AND atasan.status = 1
-        LIMIT 1
+            pp.id_pegawai AS id_sejawat,
+            pp.nama_pegawai AS nama_sejawat
+        FROM periode_pegawai pp
+        WHERE pp.id_periode = ?
+          AND pp.id_atasan = (
+              SELECT id_atasan
+              FROM periode_pegawai
+              WHERE id_periode = ?
+                AND id_pegawai = ?
+                AND status = 1
+              LIMIT 1
+          )
+          AND pp.id_pegawai != ?
+          AND pp.status = 1
+        ORDER BY pp.nama_pegawai ASC
     ", [
             $periodeId,
+            $periodeId,
+            $this->userLoggedIn['id'],
             $this->userLoggedIn['id']
         ]);
     }

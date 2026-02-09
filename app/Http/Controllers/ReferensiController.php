@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 use App\Models\Referensi;
 
 class ReferensiController extends Controller
@@ -16,55 +17,69 @@ class ReferensiController extends Controller
     public function getData()
     {
         return response()->json(
-            Referensi::where('status', '!=', 9)->get()
+            DB::select("
+                SELECT id, referensi, kode, jenis, nilai, status
+                FROM referensi
+                WHERE status != 9
+                ORDER BY kode ASC
+            ")
         );
     }
 
+
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $data = $request->validate([
             'referensi' => 'required|string',
+            'kode' => 'required|in:atasan,sejawat,bawahan,col_01,col_02,col_03,col_04,col_05,col_06,col_07',
+            'jenis' => 'required|string',
             'nilai' => 'required|numeric|min:0|max:100',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
+        DB::insert("
+            INSERT INTO referensi (referensi, kode, nilai, status)
+            VALUES (?, ?, ?, 1)
+        ", [
+            $data['referensi'],
+            $data['kode'],
+            $data['jenis'],
+            $data['nilai']
+        ]);
 
-        $data = $validator->validated();
-        $data['status'] = 1;
-
-        $referensi = Referensi::create($data);
-
-        return response()->json($referensi, 200);
+        return response()->json(['success' => true]);
     }
 
     public function update(Request $request, $id)
     {
-        $validator = Validator::make($request->all(), [
+        $data = $request->validate([
             'referensi' => 'required|string',
-            'nilai' => 'required|numeric|min:0|max:100'
+            'kode' => 'required|in:col_01,col_02,col_03,col_04,col_05,col_06,col_07',
+            'jenis' => 'required|string',
+            'nilai' => 'required|numeric|min:0|max:100',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
+        DB::update("
+            UPDATE referensi
+            SET referensi = ?, kode = ?, nilai = ?
+            WHERE id = ? AND status = 1
+        ", [
+            $data['referensi'],
+            $data['kode'],
+            $data['jenis'],
+            $data['nilai'],
+            $id
+        ]);
 
-        $referensi = Referensi::findOrFail($id);
-        $referensi->update($validator->validated());
-
-        return response()->json($referensi, 200);
+        return response()->json(['success' => true]);
     }
 
     public function delete($id)
     {
-        $referensi = Referensi::findOrFail($id);
-        if ($referensi->status != 1) {
-            return response()->json([
-                'message' => 'Referensi tidak bisa dihapus'
-            ], 422);
-        }
-        $referensi->update(['status' => 9]);
+        DB::update("
+            UPDATE referensi
+            SET status = 9
+            WHERE id = ? AND status = 1
+        ", [$id]);
 
         return response()->json(['success' => true]);
     }

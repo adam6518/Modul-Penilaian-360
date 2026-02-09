@@ -49,7 +49,7 @@ function loadData() {
 
 // Fungsi untuk menampilkan status di tabel referensi
 function renderStatus(status) {
-    if (status == 1) return '<span class="badge bg-success">Aktif</span>';
+    if (status == 1) return '<span class="text-center badge bg-success">Aktif</span>';
     return "";
 }
 
@@ -59,21 +59,24 @@ function renderTable(data) {
     data.forEach((item, index) => {
         rows += `
             <tr>
-                <td>${index + 1}</td>
-                <td>${item.referensi}</td>
-                <td>
+                <td class="text-center">${index + 1}</td>
+                <td class="text-center">${item.referensi}</td>
+                <td class="text-center">${item.kode}</td>
+                <td class="text-center">${item.jenis}</td>
+                <td class="text-center">
                     ${
                         item.nilai !== null && !isNaN(item.nilai)
                             ? parseFloat(item.nilai).toFixed(2) + "%"
                             : "-"
                     }
                 </td>
-                <td>${renderStatus(item.status)}</td>
+                <td class="text-center">${renderStatus(item.status)}</td>
                 <td>
                     <button class="btn btn-primary btn-sm editBtn"
                         data-id="${item.id}"
                         data-referensi="${item.referensi}"
-                        data-nilai="${item.nilai}">
+                        data-nilai="${item.nilai}"
+                        data-kode="${item.kode}">
                         Edit
                     </button>
                     <button class="btn btn-danger btn-sm deleteBtn"
@@ -121,71 +124,36 @@ $(document).ready(function () {
     $("#btnSimpan").on("click", function (e) {
         e.preventDefault();
 
-        let nilaiRaw = $("#nilai").val();
-
-        // normalisasi koma ke titik
-        nilaiRaw = nilaiRaw.replace(",", ".");
-
         const id = $("#referensi_id").val();
 
         const payload = {
             referensi: $("#referensi").val(),
-            nilai: parseFloat(nilaiRaw),
+            kode: $("#kode").val(),
+            kode: $("#jenis").val(),
+            nilai: parseFloat($("#nilai").val()),
         };
 
-        let url = "/referensi/store";
-        let method = "POST";
-
-        if (id) url = "/referensi/update/" + id;
-        if (isNaN(payload.nilai)) {
-            showMessage(
-                "Nilai harus berupa angka (gunakan titik, bukan koma)",
-                "error"
-            );
+        if (!payload.kode) {
+            alert("Kode wajib dipilih");
             return;
         }
 
+        let url = "/referensi/store";
+        if (id) url = "/referensi/update/" + id;
+
         $.ajax({
             url: url,
-            method: method,
+            method: "POST",
             data: payload,
-            dataType: "json",
-            headers: {
-                Accept: "application/json",
-            },
-        })
-            .done(function () {
+            success: function () {
                 loadData();
-
-                // reset form
                 resetForm();
-                showMessage("Data berhasil disimpan.");
-            })
-            .fail(function (jqXHR) {
-                if (jqXHR.status === 422) {
-                    let msg = [];
-                    const errors = jqXHR.responseJSON?.errors ?? {};
-
-                    Object.values(errors).jqXHR.forEach((arr) => {
-                        messages.push(arr.join(", "));
-                    });
-                    showToast(messages.join(" | "), "error");
-                } else if (jqXHR.status === 401 || jqXHR.status === 403) {
-                    showToast("Anda tidak memiliki akses.", "error");
-                } else {
-                    showToast("Terjadi kesalahan server.", "error");
-                }
-            });
-
-        // $.post(url, payload)
-        //     .done(function () {
-        //         loadData();
-        //         resetForm();
-        //         showToast("Data berhasil disimpan");
-        //     })
-        //     .fail(function (xhr) {
-        //         showToast("Validasi gagal", "error");
-        //     });
+                alert("Data berhasil disimpan");
+            },
+            error: function (xhr) {
+                alert(xhr.responseJSON?.message || "Gagal menyimpan data");
+            },
+        });
     });
 
     // EDIT
@@ -193,11 +161,18 @@ $(document).ready(function () {
     $(document).on("click", ".editBtn", function () {
         $("#referensi_id").val($(this).data("id"));
         $("#referensi").val($(this).data("referensi"));
-        $("#nilai").val(parseFloat(nilai).toFixed(2));
+        $("#kode").val($(this).data("kode"));
+        $("#nilai").val($(this).data("nilai"));
 
-        // Tampilkan form
         $("#formTambah").removeClass("d-none");
         $("#btnTambah").addClass("d-none");
+        // $("#referensi_id").val($(this).data("id"));
+        // $("#referensi").val($(this).data("referensi"));
+        // $("#nilai").val(parseFloat(nilai).toFixed(2));
+
+        // // Tampilkan form
+        // $("#formTambah").removeClass("d-none");
+        // $("#btnTambah").addClass("d-none");
     });
 
     // RESET FORM SETELAH EDIT SELESAI

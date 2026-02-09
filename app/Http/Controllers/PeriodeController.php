@@ -3,114 +3,80 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-use App\Models\Periode;
-use App\UseCases\Periode\{
-    GetPeriodeUseCase,
-    CreatePeriodeUseCase,
-    UpdatePeriodeUseCase,
-    DeletePeriodeUseCase
-};
+use Illuminate\Support\Facades\DB;
 
 class PeriodeController extends Controller
 {
     // Load data first time
-    public function index(GetPeriodeUseCase $useCase)
+    public function index()
     {
-        return view('periode', [
-            'periode' => $useCase->execute()
-        ]);
+        return view('periode');
     }
 
     // Ambil semua data (AJAX)
-    public function getData(GetPeriodeUseCase $useCase)
+    public function getData()
     {
-        return response()->json($useCase->execute());
+        return response()->json(
+            DB::select("
+                SELECT id, nama_periode, tanggal_awal, tanggal_akhir, status
+                FROM periode
+                WHERE status != 9
+                ORDER BY id DESC
+            ")
+        );
     }
 
-    // public function getData()
-    // {
-    //     return response()->json(
-    //         Periode::where('status', '!=', 9)->get()
-    //     );
-    // }
+    public function store(Request $request)
+    {
+        $data = $request->validate([
+            'nama_periode' => 'required|string',
+            'tanggal_awal' => 'required|date',
+            'tanggal_akhir' => 'required|date|after_or_equal:tanggal_awal',
+        ]);
 
-    // Create Periode
+        DB::insert("
+            INSERT INTO periode (nama_periode, tanggal_awal, tanggal_akhir, status)
+            VALUES (?, ?, ?, 1)
+        ", [
+            $data['nama_periode'],
+            $data['tanggal_awal'],
+            $data['tanggal_akhir'],
+        ]);
 
-    public function store(
-        Request $request,
-        CreatePeriodeUseCase $useCase
-    ) {
-        $id = $useCase->execute($request->all());
-
-        return response()->json(['id' => $id], 201);
+        return response()->json(['success' => true]);
     }
-
-    // public function store(Request $request)
-    // {
-    //     $validator = Validator::make($request->all(), [
-    //         'nama_periode' => 'required',
-    //         'tanggal_awal' => 'required|date',
-    //         'tanggal_akhir' => 'required|date|after_or_equal:tanggal_awal'
-    //     ]);
-
-    //     if ($validator->fails()) {
-    //         return response()->json(['errors' => $validator->errors()], 422);
-    //     }
-
-    //     // $periode = Periode::create($validator->validated());
-    //     $data = $validator->validated();
-    //     $data['status'] = 1;
-
-    //     $periode = Periode::create($data);
-
-
-    //     return response()->json($periode, 201);
-    // }
-
     // Update Periode
-    public function update(Request $request, int $id, UpdatePeriodeUseCase $useCase)
+    public function update(Request $request, $id)
     {
-        $useCase->execute($id, $request->all());
+        $data = $request->validate([
+            'nama_periode' => 'required|string',
+            'tanggal_awal' => 'required|date',
+            'tanggal_akhir' => 'required|date|after_or_equal:tanggal_awal',
+        ]);
+
+        DB::update("
+            UPDATE periode
+            SET nama_periode = ?, tanggal_awal = ?, tanggal_akhir = ?
+            WHERE id = ? AND status != 9
+        ", [
+            $data['nama_periode'],
+            $data['tanggal_awal'],
+            $data['tanggal_akhir'],
+            $id
+        ]);
 
         return response()->json(['success' => true]);
     }
 
     // Delete Periode
-    public function delete(int $id, DeletePeriodeUseCase $useCase)
+    public function delete($id)
     {
-        $useCase->execute($id);
+        DB::update("
+            UPDATE periode
+            SET status = 9
+            WHERE id = ? AND status != 9
+        ", [$id]);
 
         return response()->json(['success' => true]);
     }
-
-    // public function delete($id)
-    // {
-    //     $periode = Periode::findOrFail($id);
-    //     if ($periode->status == 0) {
-    //         return response()->json([
-    //             'message' => 'Periode sudah selesai dan tidak bisa dihapus'
-    //         ], 422);
-    //     }
-    //     $periode->update(['status' => 9]);
-
-    //     return response()->json(['success' => true]);
-    // }
-
-    // Get List Nama Periode untuk di Halaman Periode Pegawai
-
-    // public function getList(
-    //     PeriodeRepositoryInterface $repo
-    // ) {
-    //     return response()->json($repo->getList());
-    // }
-
-    // public function getList()
-    // {
-    //     return response()->json(
-    //         Periode::where('status', '!=', 9)
-    //             ->select('id', 'nama_periode')
-    //             ->get()
-    //     );
-    // }
 }

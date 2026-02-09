@@ -8,7 +8,6 @@ document.addEventListener("DOMContentLoaded", function () {
         btnTambah.addEventListener("click", function () {
             formTambah.classList.remove("d-none");
             btnTambah.classList.add("d-none");
-            loadPeriode();
         });
     }
 

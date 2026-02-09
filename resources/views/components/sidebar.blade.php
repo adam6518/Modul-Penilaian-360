@@ -15,7 +15,8 @@
         font-weight: 500;
         background-color: transparent;
         border: none;
-        width: max-content;
+        width: 100%;
+        text-align: start;
     }
 
     /* Hover */
@@ -50,14 +51,16 @@
         background-color: #8e0000;
     }
 </style>
-
+{{--  @push('styles')
+    <link rel="stylesheet" href="{{ asset('/public/css/sidebar.css') }}">
+@endpush  --}}
 {{-- Desktop Sidebar --}}
 <div class="sidebar border-end p-4 d-none d-lg-flex flex-column" style="min-height: 100vh;">
 
     <div>
         <div class="p-4 border-bottom">
             <h3 class="fw-bold mb-4">Modul Penilaian 360</h3>
-            <h6 class="fw-bold mb-4">Selamat datang User !</h6>
+            <h6 class="fw-bold mb-4">Selamat datang <span>{{ $userPenilai['nama'] }}</span> !</h6>
         </div>
 
         <div class="sidebar-menu-wrapper d-grid gap-4 w-100 mt-5">
@@ -85,14 +88,18 @@
                     </svg>Penilaian
                 </a>
                 <ul class="dropdown-menu">
-                    <a href="{{ route('penilaian-atasan.index') }}" class="dropdown-item">
-                        <li  class="btn-success btn-l" ><button type="button">Penilaian Atasan</button>
-                        </li>
+                    <a href="{{ route('penilaian-bawahan.index') }}" class="dropdown-item btn-success btn-l"
+                        role="button">
+                        Penilaian Bawahan
                     </a>
-                    <li><button class="dropdown-item btn btn-success btn-l" type="button">Penilaian Sejawat</button>
-                    </li>
-                    <li><button class="dropdown-item btn btn-success btn-l" type="button">Penilaian Bawahan</button>
-                    </li>
+                    <a href="{{ route('penilaian-atasan.index') }}" class="dropdown-item btn-success btn-l"
+                        role="button">
+                        Penilaian Atasan
+                    </a>
+                    <a href="{{ route('penilaian-sejawat.index') }}" class="dropdown-item btn-success btn-l"
+                        role="button">
+                        Penilaian Sejawat
+                    </a>
                 </ul>
             </div>
             <a href="{{ route('periode-pegawai.index') }}" class="sidebar-menu btn btn-success btn-l">
@@ -102,12 +109,12 @@
                         d="M15.854 5.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L12.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0" />
                     <path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
                 </svg>Periode Pegawai</a>
-            <a class="sidebar-menu btn btn-success btn-l">
+            <a href="{{ route('rekap-penilaian.index') }}" class="sidebar-menu btn btn-success btn-l">
                 <svg class="mx-3" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                     class="bi bi-calculator-fill" viewBox="0 0 16 16">
                     <path
                         d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2zm2 .5v2a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 0-.5-.5h-7a.5.5 0 0 0-.5.5m0 4v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5M4.5 9a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zM4 12.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5M7.5 6a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zM7 9.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5m.5 2.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zM10 6.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5m.5 2.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5z" />
-                </svg>Kalkulasi Penilaian</a>
+                </svg>Rekap Penilaian</a>
         </div>
     </div>
 
@@ -135,7 +142,7 @@
             <button class="btn btn-success" type="button">Referensi</button>
             <button class="btn btn-success" type="button">Penilaian</button>
             <button class="btn btn-success" type="button">Periode Pegawai</button>
-            <button class="btn btn-success" type="button">Kalkulasi Penilaian</button>
+            <button class="btn btn-success" type="button">Rekap Penilaian</button>
         </div>
 
         <div class="mt-auto pt-4">

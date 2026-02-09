@@ -1,15 +1,15 @@
 @extends('layouts.app')
 
 @push('scripts')
-    <script src="{{ asset('js/penilaian-atasan.js') }}"></script>
+    <script src="{{ asset('js/penilaian-sejawat.js') }}"></script>
 @endpush
 
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('css/penilaian-atasan.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/penilaian-sejawat.css') }}">
 @endpush
 
 @section('content')
-    <h1 class="fw-bold mb-4">Penilaian Atasan</h1>
+    <h1 class="fw-bold mb-4">Penilaian Sejawat</h1>
     <script>
         window.USER_PENILAI = @json($userPenilai); //userPenilai berasal dari func index di controller
     </script>

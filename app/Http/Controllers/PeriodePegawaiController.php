@@ -18,7 +18,7 @@ class PeriodePegawaiController extends Controller
                     "id_atasan" => null,
                     "nama_pegawai" => "Atasan 1",
                     "nip" => "2440086703",
-                    "id_pegawai" => 3,
+                    "id_pegawai" => 12,
                     "id_satker" => 13,
                     "status" => 1
                 ],

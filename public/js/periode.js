@@ -63,12 +63,12 @@ function renderTable(data) {
     data.forEach((item, index) => {
         html += `
         <tr>
-            <td>${index + 1}</td>
-            <td>${item.nama_periode}</td>
-            <td>${item.tanggal_awal}</td>
-            <td>${item.tanggal_akhir}</td>
-            <td>${renderStatus(item.status)}</td>
-            <td>
+            <td class="text-center">${index + 1}</td>
+            <td class="text-center">${item.nama_periode}</td>
+            <td class="text-center">${item.tanggal_awal}</td>
+            <td class="text-center">${item.tanggal_akhir}</td>
+            <td class="text-center">${renderStatus(item.status)}</td>
+            <td class="text-center">
                 <button
                     type="button"
                     class="btn btn-primary btn-sm editBtn"

@@ -3,6 +3,7 @@
     <script>
         const PERIODE_ID = {{ $periodeId }};
         const SATKER_ID = {{ $satkerId }};
+        const JUMLAH_INDIKATOR = {{ count($indikator) }};
     </script>
     <script src="{{ asset('js/rekap-penilaian-view.js') }}"></script>
 @endpush
@@ -22,13 +23,16 @@
                     <tr>
                         <th>No</th>
                         <th>Nama Pegawai</th>
-                        <th>Ber</th>
+                        {{--  <th>Ber</th>
                         <th>A</th>
                         <th>K</th>
                         <th>H</th>
                         <th>L</th>
                         <th>A</th>
-                        <th>K</th>
+                        <th>K</th>  --}}
+                        @foreach ($indikator as $item)
+                            <th>{{ $item->referensi }}</th>
+                        @endforeach
                         <th>Total Nilai</th>
                     </tr>
                 </thead>

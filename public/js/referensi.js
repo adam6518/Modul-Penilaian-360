@@ -71,7 +71,7 @@ function renderTable(data) {
                     }
                 </td>
                 <td class="text-center">${renderStatus(item.status)}</td>
-                <td>
+                <td class="text-center">
                     <button class="btn btn-primary btn-sm editBtn"
                         data-id="${item.id}"
                         data-referensi="${item.referensi}"

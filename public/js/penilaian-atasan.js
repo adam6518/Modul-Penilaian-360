@@ -96,15 +96,16 @@ function renderCheckboxTernilai(data) {
 
     if (!data.length) {
         html = `
-            <tr>
-                <td colspan="10" class="text-center text-muted">
+           <tr>
+                <td colspan="${window.INDIKATOR.length + 3}"
+                    class="text-center text-muted">
                     Tidak ada atasan
                 </td>
             </tr>`;
     } else {
         data.forEach((row) => {
             console.log(row);
-            
+
             html += `
                 <tr data-id="${row.id_atasan}" data-nama="${row.nama_atasan.toLowerCase()}">
                     <td>
@@ -113,13 +114,9 @@ function renderCheckboxTernilai(data) {
                     </td>
                     <td>${window.USER_PENILAI.nama}</td>
 
-                    ${renderPreview(row.id_atasan, "col_01")}
-                    ${renderPreview(row.id_atasan, "col_02")}
-                    ${renderPreview(row.id_atasan, "col_03")}
-                    ${renderPreview(row.id_atasan, "col_04")}
-                    ${renderPreview(row.id_atasan, "col_05")}
-                    ${renderPreview(row.id_atasan, "col_06")}
-                    ${renderPreview(row.id_atasan, "col_07")}
+                   ${window.INDIKATOR.map((ind) =>
+                       renderPreview(row.id_atasan, ind.kode),
+                   ).join("")}
 
                     <td></td>
                 </tr>

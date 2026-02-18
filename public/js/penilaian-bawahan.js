@@ -97,7 +97,7 @@ function renderCheckboxTernilai(data) {
     if (!data.length) {
         html = `
             <tr>
-                <td colspan="10" class="text-center text-muted">
+                <td colspan="${window.INDIKATOR.length + 3}" class="text-center text-muted">
                     Tidak ada bawahan
                 </td>
             </tr>`;
@@ -111,13 +111,9 @@ function renderCheckboxTernilai(data) {
                     </td>
                     <td>${window.USER_PENILAI.nama}</td>
 
-                    ${renderPreview(row.id, "col_01")}
-                    ${renderPreview(row.id, "col_02")}
-                    ${renderPreview(row.id, "col_03")}
-                    ${renderPreview(row.id, "col_04")}
-                    ${renderPreview(row.id, "col_05")}
-                    ${renderPreview(row.id, "col_06")}
-                    ${renderPreview(row.id, "col_07")}
+                   ${window.INDIKATOR.map((ind) =>
+                       renderPreview(row.id, ind.kode),
+                   ).join("")}
 
                     <td></td>
                 </tr>

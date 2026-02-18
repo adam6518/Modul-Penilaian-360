@@ -16,8 +16,17 @@ class PenilaianAtasanController extends Controller
     // LOAD PAGE
     public function index()
     {
+        $indikator = DB::select("
+        SELECT id, referensi, kode
+        FROM referensi
+        WHERE jenis = 'penilaian'
+          AND status = 1
+        ORDER BY id
+    ");
+
         return view('penilaian-atasan', [
-            'userPenilai' => $this->userLoggedIn // Dikirim ke penilaian-atasan.blade.php di window.USER_PENILAI
+            'userPenilai' => $this->userLoggedIn,
+            'indikator'   => $indikator
         ]);
     }
 
@@ -105,10 +114,19 @@ class PenilaianAtasanController extends Controller
         try {
             foreach ($rows as $row) {
 
-                DB::insert("
+                DB::statement("
                 INSERT INTO penilaian
-                (id_periode, id_penilai, id_ternilai, col_01, col_02, col_03, col_04, col_05, col_06, col_07)
+                (id_periode, id_penilai, id_ternilai,
+                 col_01, col_02, col_03, col_04, col_05, col_06, col_07)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE
+                    col_01 = VALUES(col_01),
+                    col_02 = VALUES(col_02),
+                    col_03 = VALUES(col_03),
+                    col_04 = VALUES(col_04),
+                    col_05 = VALUES(col_05),
+                    col_06 = VALUES(col_06),
+                    col_07 = VALUES(col_07)
             ", [
                     $periodeId,
                     $this->userLoggedIn['id'],

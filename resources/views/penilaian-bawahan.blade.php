@@ -12,6 +12,7 @@
     <h1 class="fw-bold mb-4">Penilaian Bawahan</h1>
     <script>
         window.USER_PENILAI = @json($userPenilai); //userPenilai berasal dari func index di controller
+        window.INDIKATOR = @json($indikator);
     </script>
     <div id="formTambah" class="mb-4">
         <div class="d-flex gap-2">
@@ -73,13 +74,9 @@
                                 <span class="ms-1">Nama Ternilai</span>
                             </th>
                             <th>Nama Penilai</th>
-                            <th>Ber</th>
-                            <th>A</th>
-                            <th>K</th>
-                            <th>H</th>
-                            <th>L</th>
-                            <th>A</th>
-                            <th>K</th>
+                            @foreach ($indikator as $item)
+                                <th>{{ $item->referensi }}</th>
+                            @endforeach
                             <th>Aksi</th>
                         </tr>
                         {{-- Search Row (Responsive Bootstrap Only) --}}

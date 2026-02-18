@@ -16,8 +16,17 @@ class PenilaianBawahanController extends Controller
     // LOAD PAGE
     public function index()
     {
+        $indikator = DB::select("
+        SELECT id, referensi, kode
+        FROM referensi
+        WHERE jenis = 'penilaian'
+          AND status = 1
+        ORDER BY id
+    ");
+
         return view('penilaian-bawahan', [
-            'userPenilai' => $this->userLoggedIn // Dikirim ke penilaian-atasan.blade.php di window.USER_PENILAI
+            'userPenilai' => $this->userLoggedIn,
+            'indikator'   => $indikator
         ]);
     }
 

@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Exports\RekapPenilaianExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
+
 
 class RekapPenilaianController extends Controller
 {
@@ -28,12 +32,24 @@ class RekapPenilaianController extends Controller
     public function detail(int $periodeId)
     {
         $periode = DB::selectOne("
-                SELECT id, nama_periode
-                FROM periode
-                WHERE id = ?
-            ", [$periodeId]);
+        SELECT id, nama_periode
+        FROM periode
+        WHERE id = ?
+    ", [$periodeId]);
 
-        return view('rekap-penilaian-detail', compact('periode'));
+        $indikator = DB::select("
+        SELECT referensi
+        FROM referensi
+        WHERE jenis = 'penilaian'
+          AND status = 1
+        ORDER BY id
+    ");
+
+        return view('rekap-penilaian-detail', compact(
+            'periode',
+            'periodeId',
+            'indikator'
+        ));
     }
 
     public function getSatker(int $periodeId)
@@ -205,5 +221,89 @@ GROUP BY pn.id_ternilai, pn.id_periode;
                 'message' => $e->getMessage()
             ], 500);
         }
+    }
+    public function exportExcel(int $periodeId)
+    {
+        // Ambil data periode
+        $periodeExcel = DB::selectOne("
+        SELECT YEAR(tanggal_awal) AS tahun
+        FROM periode
+        WHERE id = ?
+    ", [$periodeId]);
+
+        if (!$periodeExcel) {
+            abort(404, 'Periode tidak ditemukan');
+        }
+
+        // Ambil semua satker dalam periode tersebut
+        $satkerList = DB::select("
+        SELECT DISTINCT id_satker
+        FROM periode_pegawai
+        WHERE id_periode = ?
+          AND status = 1
+        ORDER BY id_satker
+    ", [$periodeId]);
+
+        $filename = "rekap_penilaian_{$periodeExcel->tahun}.xlsx";
+
+        return Excel::download(
+            new RekapPenilaianExport($periodeId, $satkerList),
+            $filename
+        );
+    }
+
+    public function exportPdf(int $periodeId, int $satkerId)
+    {
+        // Ambil tahun periode
+        $periode = DB::selectOne("
+        SELECT YEAR(tanggal_awal) AS tahun
+        FROM periode
+        WHERE id = ?
+    ", [$periodeId]);
+
+        if (!$periode) {
+            abort(404, 'Periode tidak ditemukan');
+        }
+
+        // Ambil indikator
+        $indikator = DB::select("
+        SELECT referensi
+        FROM referensi
+        WHERE jenis = 'penilaian'
+          AND status = 1
+        ORDER BY id
+    ");
+
+        // Ambil data pegawai (sama seperti Excel)
+        $data = DB::select("
+        SELECT
+            pp.nama_pegawai,
+            MAX(kp.col_01) AS col_01,
+            MAX(kp.col_02) AS col_02,
+            MAX(kp.col_03) AS col_03,
+            MAX(kp.col_04) AS col_04,
+            MAX(kp.col_05) AS col_05,
+            MAX(kp.col_06) AS col_06,
+            MAX(kp.col_07) AS col_07,
+            MAX(kp.total)  AS total
+        FROM kalkulasi_penilaian kp
+        JOIN periode_pegawai pp
+          ON pp.id_pegawai = kp.id_pegawai
+         AND pp.id_periode = kp.id_periode
+        WHERE kp.id_periode = ?
+          AND pp.id_satker = ?
+        GROUP BY kp.id_pegawai, pp.nama_pegawai
+        ORDER BY total DESC
+    ", [$periodeId, $satkerId]);
+
+        $pdf = Pdf::loadView('exports.rekap-satker-pdf', [
+            'data' => $data,
+            'indikator' => $indikator,
+            'satkerId' => $satkerId
+        ])->setPaper('a4', 'landscape');
+
+        $filename = "rekap_penilaian_satker_{$satkerId}_{$periode->tahun}.pdf";
+
+        return $pdf->download($filename);
     }
 }

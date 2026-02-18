@@ -78,3 +78,13 @@ Route::post(
     '/rekap-penilaian/{periodeId}/kalkulasi',
     [RekapPenilaianController::class, 'kalkulasi']
 );
+
+Route::get(
+    '/rekap-penilaian/{periodeId}/export/excel',
+    [RekapPenilaianController::class, 'exportExcel']
+);
+
+Route::get(
+    '/rekap-penilaian/{periodeId}/satker/{satkerId}/export/pdf',
+    [RekapPenilaianController::class, 'exportPdf']
+);

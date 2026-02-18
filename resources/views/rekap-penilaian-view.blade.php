@@ -15,6 +15,12 @@
     <h1 class="fw-bold mb-4">
         Rekap Pegawai – Satker {{ $satkerId }}
     </h1>
+    <div class="mb-3 text-end">
+        <a href="/rekap-penilaian/{{ $periodeId }}/satker/{{ $satkerId }}/export/pdf" class="btn btn-danger btn-sm">
+            Export PDF
+        </a>
+    </div>
+
 
     <div class="card shadow-sm">
         <div class="card-body">
@@ -23,13 +29,6 @@
                     <tr>
                         <th>No</th>
                         <th>Nama Pegawai</th>
-                        {{--  <th>Ber</th>
-                        <th>A</th>
-                        <th>K</th>
-                        <th>H</th>
-                        <th>L</th>
-                        <th>A</th>
-                        <th>K</th>  --}}
                         @foreach ($indikator as $item)
                             <th>{{ $item->referensi }}</th>
                         @endforeach

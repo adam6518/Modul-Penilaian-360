@@ -16,8 +16,17 @@ class PenilaianSejawatController extends Controller
     // LOAD PAGE
     public function index()
     {
-        return view('penilaian-sejawat', [
-            'userPenilai' => $this->userLoggedIn // Dikirim ke penilaian-atasan.blade.php di window.USER_PENILAI
+        $indikator = DB::select("
+        SELECT id, referensi, kode
+        FROM referensi
+        WHERE jenis = 'penilaian'
+          AND status = 1
+        ORDER BY id
+    ");
+
+        return view('penilaian-atasan', [
+            'userPenilai' => $this->userLoggedIn,
+            'indikator'   => $indikator
         ]);
     }
 

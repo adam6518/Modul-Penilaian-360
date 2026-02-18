@@ -78,7 +78,7 @@ function getSelectedTernilai() {
 ================================ */
 function renderPreview(id, field) {
     // console.log(field);
-    
+
     return `
         <td>
             <span class="preview-${field}-${id}">-</span>
@@ -99,7 +99,7 @@ function renderCheckboxTernilai(data) {
     if (!data.length) {
         html = `
             <tr>
-                <td colspan="10" class="text-center text-muted">
+                <td colspan="${window.INDIKATOR.length + 3}" class="text-center text-muted">
                     Tidak ada atasan
                 </td>
             </tr>`;
@@ -113,14 +113,9 @@ function renderCheckboxTernilai(data) {
                     </td>
                     <td>${window.USER_PENILAI.nama}</td>
 
-                    ${renderPreview(row.id_sejawat, "col_01")}
-                    ${renderPreview(row.id_sejawat, "col_02")}
-                    ${renderPreview(row.id_sejawat, "col_03")}
-                    ${renderPreview(row.id_sejawat, "col_04")}
-                    ${renderPreview(row.id_sejawat, "col_05")}
-                    ${renderPreview(row.id_sejawat, "col_06")}
-                    ${renderPreview(row.id_sejawat, "col_07")}
-
+                    ${window.INDIKATOR.map((ind) =>
+                        renderPreview(row.id_atasan, ind.kode),
+                    ).join("")}
                     <td></td>
                 </tr>
             `;
@@ -135,7 +130,7 @@ function renderCheckboxTernilai(data) {
 ================================ */
 function renderInput(id, field) {
     console.log(field);
-    
+
     return `
         <td>
             <input type="number"

@@ -166,13 +166,6 @@ $(document).ready(function () {
 
         $("#formTambah").removeClass("d-none");
         $("#btnTambah").addClass("d-none");
-        // $("#referensi_id").val($(this).data("id"));
-        // $("#referensi").val($(this).data("referensi"));
-        // $("#nilai").val(parseFloat(nilai).toFixed(2));
-
-        // // Tampilkan form
-        // $("#formTambah").removeClass("d-none");
-        // $("#btnTambah").addClass("d-none");
     });
 
     // RESET FORM SETELAH EDIT SELESAI

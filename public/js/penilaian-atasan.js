@@ -13,6 +13,9 @@ $.ajaxSetup({
    LOAD PERIODE (DROPDOWN)
 ================================ */
 function loadPeriode() {
+    if (window.APP_ROLE === "admin") {
+        fetch("/periode-pegawai/list");
+    }
     $.ajax({
         url: "/periode-pegawai/list",
         method: "GET",

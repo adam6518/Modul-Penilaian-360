@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 let selectedPeriode = null;
-let periodePegawaiData = [];
+// let periodePegawaiData = [];
 let periodeAktif = false;
 let selectedPeriodeModal = null;
 
@@ -219,7 +219,8 @@ function hapusData(id) {
             loadFromDb();
             // reload table
             if (selectedPeriode) {
-                tampilkanData(selectedPeriode);
+                // tampilkanData(selectedPeriode);
+                loadFromDb();
             }
         },
         error: function (xhr) {

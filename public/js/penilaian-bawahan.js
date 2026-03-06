@@ -103,6 +103,8 @@ function renderCheckboxTernilai(data) {
             </tr>`;
     } else {
         data.forEach((row) => {
+            console.log(row);
+            
             html += `
                 <tr data-id="${row.id}" data-nama="${row.nama_pegawai.toLowerCase()}">
                     <td>

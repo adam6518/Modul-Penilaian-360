@@ -7,15 +7,20 @@ use Illuminate\Support\Facades\DB;
 
 class PenilaianSejawatController extends Controller
 {
-    // DUMMY USER LOGGED IN
-    private array $userLoggedIn = [
-        'id' => 18,
-        'nama' => 'Bawahan A2 A'
-    ];
-
     // LOAD PAGE
     public function index()
-    {
+    {   
+        $userLoggedIn = session('active_user_id');    
+    
+        $userPenilai = null;
+
+        if ($userLoggedIn) {
+            $userPenilai = DB::table('periode_pegawai')
+                ->where('id_pegawai', $userLoggedIn)
+                ->select('id_pegawai as id', 'nama_pegawai as nama')
+                ->first();
+        }
+
         $indikator = DB::select("
         SELECT id, referensi, kode
         FROM referensi
@@ -24,8 +29,8 @@ class PenilaianSejawatController extends Controller
         ORDER BY id
     ");
 
-        return view('penilaian-atasan', [
-            'userPenilai' => $this->userLoggedIn,
+        return view('penilaian-sejawat', [
+            'userPenilai' => $userPenilai,
             'indikator'   => $indikator
         ]);
     }
@@ -99,6 +104,7 @@ class PenilaianSejawatController extends Controller
     {
         $periodeId = $request->periode_id;
         $rows = $request->penilaian;
+        $userLoggedIn = session('active_user_id');
 
         if (!is_array($rows) || empty($rows)) {
             return response()->json([
@@ -120,7 +126,7 @@ class PenilaianSejawatController extends Controller
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ", [
                     $periodeId,
-                    $this->userLoggedIn['id'],
+                    $userLoggedIn['id'],
                     $row['id_ternilai'],
 
                     // HITUNG NILAI
@@ -155,29 +161,44 @@ class PenilaianSejawatController extends Controller
     public function getSejawatByPeriode(Request $request)
     {
         $periodeId = $request->periode_id;
+        $userId    = session('active_user_id');
+        /*
+    |------------------------------------------------------------
+    | 1. Ambil id_atasan user dulu
+    |------------------------------------------------------------
+    */
+        $user = DB::selectOne("
+        SELECT id_atasan
+        FROM periode_pegawai
+        WHERE id_periode = ?
+          AND id_pegawai = ?
+          AND status = 1
+        LIMIT 1
+    ", [$periodeId, $userId]);
 
+        if (!$user || !$user->id_atasan) {
+            return [];
+        }
+
+        /*
+    |------------------------------------------------------------
+    | 2. Ambil semua bawahan dengan atasan yang sama
+    |------------------------------------------------------------
+    */
         return DB::select("
         SELECT
             pp.id_pegawai AS id_sejawat,
             pp.nama_pegawai AS nama_sejawat
         FROM periode_pegawai pp
         WHERE pp.id_periode = ?
-          AND pp.id_atasan = (
-              SELECT id_atasan
-              FROM periode_pegawai
-              WHERE id_periode = ?
-                AND id_pegawai = ?
-                AND status = 1
-              LIMIT 1
-          )
+          AND pp.id_atasan = ?
           AND pp.id_pegawai != ?
           AND pp.status = 1
         ORDER BY pp.nama_pegawai ASC
     ", [
             $periodeId,
-            $periodeId,
-            $this->userLoggedIn['id'],
-            $this->userLoggedIn['id']
+            $user->id_atasan,
+            $userId
         ]);
     }
 }

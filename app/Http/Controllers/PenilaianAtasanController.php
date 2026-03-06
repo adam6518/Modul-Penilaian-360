@@ -7,15 +7,20 @@ use Illuminate\Support\Facades\DB;
 
 class PenilaianAtasanController extends Controller
 {
-    // DUMMY USER LOGGED IN
-    private array $userLoggedIn = [
-        'id' => 18,
-        'nama' => 'Bawahan A2 A'
-    ];
-
     // LOAD PAGE
     public function index()
     {
+        $userLoggedIn = session('active_user_id');
+
+        $userPenilai = null;
+
+        if ($userLoggedIn) {
+            $userPenilai = DB::table('periode_pegawai')
+                ->where('id_pegawai', $userLoggedIn)
+                ->select('id_pegawai as id', 'nama_pegawai as nama')
+                ->first();
+        }
+
         $indikator = DB::select("
         SELECT id, referensi, kode
         FROM referensi
@@ -25,7 +30,7 @@ class PenilaianAtasanController extends Controller
     ");
 
         return view('penilaian-atasan', [
-            'userPenilai' => $this->userLoggedIn,
+            'userPenilai' => $userPenilai,
             'indikator'   => $indikator
         ]);
     }
@@ -99,6 +104,7 @@ class PenilaianAtasanController extends Controller
     {
         $periodeId = $request->periode_id;
         $rows = $request->penilaian;
+        $userLoggedIn = session('active_user_id');
 
         if (!is_array($rows) || empty($rows)) {
             return response()->json([
@@ -129,7 +135,7 @@ class PenilaianAtasanController extends Controller
                     col_07 = VALUES(col_07)
             ", [
                     $periodeId,
-                    $this->userLoggedIn['id'],
+                    $userLoggedIn,
                     $row['id_ternilai'],
 
                     // HITUNG NILAI
@@ -164,6 +170,10 @@ class PenilaianAtasanController extends Controller
     public function getAtasanByPeriode(Request $request)
     {
         $periodeId = $request->periode_id;
+        $userLoggedIn = session('active_user_id');
+        if (!$userLoggedIn) {
+            return response()->json([], 200);
+        }
 
         return DB::select("
         SELECT
@@ -180,7 +190,7 @@ class PenilaianAtasanController extends Controller
         LIMIT 1
     ", [
             $periodeId,
-            $this->userLoggedIn['id']
+            $userLoggedIn
         ]);
     }
 }

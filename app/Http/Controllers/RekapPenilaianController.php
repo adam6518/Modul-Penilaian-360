@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Exports\RekapPenilaianExport;
 use Maatwebsite\Excel\Facades\Excel;
@@ -74,7 +73,6 @@ class RekapPenilaianController extends Controller
         =============================== */
     public function viewPegawai(int $periodeId, int $satkerId)
     {
-        // return view('rekap-penilaian-view', compact('periodeId', 'satkerId'));
         $indikator = DB::select("
         SELECT id, referensi, kode
         FROM referensi

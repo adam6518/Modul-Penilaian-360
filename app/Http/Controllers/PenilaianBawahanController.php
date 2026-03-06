@@ -7,15 +7,20 @@ use Illuminate\Support\Facades\DB;
 
 class PenilaianBawahanController extends Controller
 {
-    // DUMMY USER LOGGED IN
-    private array $userLoggedIn = [
-        'id' => 12,
-        'nama' => 'Atasan 1'
-    ];
-
     // LOAD PAGE
     public function index()
     {
+        $userLoggedIn = session('active_user_id');
+
+        $userPenilai = null;
+
+        if ($userLoggedIn) {
+            $userPenilai = DB::table('periode_pegawai')
+                ->where('id_pegawai', $userLoggedIn)
+                ->select('id_pegawai as id', 'nama_pegawai as nama')
+                ->first();
+        }
+
         $indikator = DB::select("
         SELECT id, referensi, kode
         FROM referensi
@@ -25,7 +30,7 @@ class PenilaianBawahanController extends Controller
     ");
 
         return view('penilaian-bawahan', [
-            'userPenilai' => $this->userLoggedIn,
+            'userPenilai' => $userPenilai,
             'indikator'   => $indikator
         ]);
     }
@@ -99,6 +104,13 @@ class PenilaianBawahanController extends Controller
     {
         $periodeId = $request->periode_id;
         $rows = $request->penilaian;
+        $userLoggedIn = session('active_user_id');
+        if (!$userLoggedIn) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User belum dipilih'
+            ], 403);
+        }
 
         if (!is_array($rows) || empty($rows)) {
             return response()->json([
@@ -120,7 +132,7 @@ class PenilaianBawahanController extends Controller
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ", [
                     $periodeId,
-                    $this->userLoggedIn['id'],
+                    $userLoggedIn,
                     $row['id_ternilai'],
 
                     // HITUNG NILAI
@@ -155,6 +167,10 @@ class PenilaianBawahanController extends Controller
     public function getBawahanByPeriode(Request $request)
     {
         $periodeId = $request->periode_id;
+        $userLoggedIn = session('active_user_id');
+        if (!$userLoggedIn) {
+            return response()->json([], 200);
+        }
 
         return DB::select("
         SELECT
@@ -163,11 +179,13 @@ class PenilaianBawahanController extends Controller
         FROM periode_pegawai pp
         WHERE pp.id_periode = ?
           AND pp.id_atasan = ?
+          AND pp.id_pegawai != ?
           AND pp.status = 1
         ORDER BY pp.nama_pegawai ASC
     ", [
             $periodeId,
-            $this->userLoggedIn['id']
+            $userLoggedIn,
+            $userLoggedIn
         ]);
     }
 }

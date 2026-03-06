@@ -1,16 +1,9 @@
 .btn-primary {
     background-color: #1f3a5f;
 }
-
 .btn-danger {
     background-color: #c62828;
 }
-
 .btn-secondary {
     background-color: #4a6fa5;
-}
-
-.table th,
-.table td {
-    vertical-align: middle;
 }

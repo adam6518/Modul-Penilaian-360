@@ -13,6 +13,7 @@
     <script>
         window.USER_PENILAI = @json($userPenilai); //userPenilai berasal dari func index di controller
         window.INDIKATOR = @json($indikator);
+        window.APP_ROLE = "{{ session('role') }}";
     </script>
     <div id="formTambah" class="mb-4">
         <div class="d-flex gap-2">

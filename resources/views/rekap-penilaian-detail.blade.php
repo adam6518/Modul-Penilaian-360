@@ -2,7 +2,6 @@
 @push('scripts')
     <script>
         const PERIODE_ID = {{ $periode->id }};
-        {{--  const PERIODE_EXCEL = {{ $periodeExcel }};  --}}
     </script>
     </script>
     <script src="{{ asset('js/rekap-penilaian-detail.js') }}"></script>

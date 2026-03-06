@@ -43,6 +43,7 @@
             }
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 {{--  @include('components.sidebar', ['userPenilai' => $userPenilai])  --}}
 

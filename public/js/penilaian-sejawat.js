@@ -95,7 +95,8 @@ function renderPreview(id, field) {
 ================================ */
 function renderCheckboxTernilai(data) {
     let html = "";
-
+    console.log(data);
+    
     if (!data.length) {
         html = `
             <tr>
@@ -114,7 +115,7 @@ function renderCheckboxTernilai(data) {
                     <td>${window.USER_PENILAI.nama}</td>
 
                     ${window.INDIKATOR.map((ind) =>
-                        renderPreview(row.id_atasan, ind.kode),
+                        renderPreview(row.id_sejawat, ind.kode),
                     ).join("")}
                     <td></td>
                 </tr>

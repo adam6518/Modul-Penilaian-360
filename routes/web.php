@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\PeriodeController;
 use App\Http\Controllers\ReferensiController;
 use App\Http\Controllers\PeriodePegawaiController;
@@ -9,6 +11,8 @@ use App\Http\Controllers\PenilaianAtasanController;
 use App\Http\Controllers\PenilaianSejawatController;
 use App\Http\Controllers\RekapPenilaianController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DashboardProfileController;
+use App\Http\Controllers\StatistikController;
 
 Route::get('/', [DashboardController::class, 'index']);
 
@@ -88,3 +92,46 @@ Route::get(
     '/rekap-penilaian/{periodeId}/satker/{satkerId}/export/pdf',
     [RekapPenilaianController::class, 'exportPdf']
 );
+
+// DASHBOARD PROFILE
+Route::get(
+    '/dashboard-profile',
+    [DashboardProfileController::class, 'index']
+)->name('dashboard-profile.index');
+
+Route::post('/set-role', function (Request $request) {
+    session(['role' => $request->role]);
+    return response()->json(['success' => true]);
+})->name('set-role');
+
+// GLOBAL SESSION FOR LOGGED IN USER
+Route::post('/set-active-user', function (Request $request) {
+    session(['role' => $request->role]);
+
+    if ($request->role === 'admin') {
+
+        session()->forget('active_user_id');
+        session()->forget('active_user_nama');
+        session()->forget('active_user_nip');
+    } else {
+
+        $pegawai = DB::table('periode_pegawai')
+            ->where('id_pegawai', $request->user_id)
+            ->first();
+
+        session([
+            'active_user_id'   => $pegawai->id_pegawai,
+            'active_user_nama' => $pegawai->nama_pegawai,
+            'active_user_nip'  => $pegawai->nip,
+        ]);
+    }
+
+    return response()->json(['success' => true]);
+})->name('set-active-user');
+
+// STATISTIK
+
+Route::get('/statistik', [StatistikController::class, 'index'])
+    ->name('statistik.index');
+
+Route::get('/statistik/data', [StatistikController::class, 'getData']);

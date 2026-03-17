@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-// use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class PeriodePegawaiController extends Controller
 {
@@ -173,41 +173,50 @@ class PeriodePegawaiController extends Controller
     public function importFromJson(Request $request)
 
     {
-        $periodeId = $request->periode_id;
+        try {
+            $periodeId = $request->periode_id;
 
-        $data = $this->dataPeriodePegawai['record']['data'];
+            $data = $this->dataPeriodePegawai['record']['data'];
 
-        $filtered = array_filter(
-            $data,
-            fn($row) => (int) $row['id_periode'] === (int)$periodeId
-        );
+            $filtered = array_filter(
+                $data,
+                fn($row) => (int) $row['id_periode'] === (int)$periodeId
+            );
 
-        if (count($filtered) === 0) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Tidak ada data periode pegawai untuk periode ini'
-            ], 422);
-        }
+            if (count($filtered) === 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tidak ada data periode pegawai untuk periode ini'
+                ], 422);
+            }
 
-        foreach ($filtered as $row) {
-            DB::insert("
+            foreach ($filtered as $row) {
+                DB::insert("
                 INSERT INTO periode_pegawai
                 (id_periode, id_atasan, nama_pegawai, nip, id_pegawai, id_satker, status)
                 VALUES (?, ?, ?, ?, ?, ?, 1)
             ", [
-                $row['id_periode'],
-                $row['id_atasan'] ?? 0,
-                $row['nama_pegawai'],
-                $row['nip'],
-                $row['id_pegawai'],
-                $row['id_satker'],
-            ]);
-        }
+                    $row['id_periode'],
+                    $row['id_atasan'] ?? 0,
+                    $row['nama_pegawai'],
+                    $row['nip'],
+                    $row['id_pegawai'],
+                    $row['id_satker'],
+                ]);
+            }
 
-        return response()->json([
-            'success' => true,
-            'inserted' => count($filtered)
-        ]);
+            return response()->json([
+                'success' => true,
+                'inserted' => count($filtered)
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => "Import Gagal"
+            ], 500);
+        }
     }
 
     // Tampilkan data dari DB
@@ -224,39 +233,57 @@ class PeriodePegawaiController extends Controller
     // Hapus data periode pegawai per row
     public function destroy($id)
     {
-        DB::update("
+        try {
+            DB::update("
         UPDATE periode_pegawai
         SET status = 9
         WHERE id = ?
     ", [$id]);
 
-        return response()->json([
-            'success' => true
-        ]);
+            return response()->json([
+                'success' => true
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => "Gagal Menghapus"
+            ], 500);
+        }
     }
 
     // Hapus data by periode
     public function destroyByPeriode(Request $request)
     {
-        $periodeId = $request->periode_id;
+        try {
+            $periodeId = $request->periode_id;
 
-        if (! $periodeId) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Periode tidak valid'
-            ], 422);
-        }
+            if (! $periodeId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Periode tidak valid'
+                ], 422);
+            }
 
-        DB::update("
+            DB::update("
         UPDATE periode_pegawai
         SET status = 9
         WHERE id_periode = ?
         AND status = 1
     ", [$periodeId]);
 
-        return response()->json([
-            'success' => true
-        ]);
+            return response()->json([
+                'success' => true
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => "Gagal Menghapus"
+            ], 500);
+        }
     }
 
     public function sync(Request $request)

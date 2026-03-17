@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ReferensiController extends Controller
 {
@@ -14,7 +15,8 @@ class ReferensiController extends Controller
 
     public function getData()
     {
-        return response()->json(
+        try {
+            return response()->json(
             DB::select("
                 SELECT id, referensi, kode, jenis, nilai, status
                 FROM referensi
@@ -22,6 +24,14 @@ class ReferensiController extends Controller
                 ORDER BY kode ASC
             ")
         );
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            
+            return response()->json([
+                'success'=>false,
+                'message'=>"Gagal Menampilkan Referensi"
+            ], 500);
+        }
     }
 
 
@@ -34,7 +44,8 @@ class ReferensiController extends Controller
             'nilai' => 'required|numeric|min:0|max:100',
         ]);
 
-        DB::insert("
+        try {
+            DB::insert("
             INSERT INTO referensi (referensi, kode, nilai, status)
             VALUES (?, ?, ?, 1)
         ", [
@@ -45,6 +56,14 @@ class ReferensiController extends Controller
         ]);
 
         return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            
+            return response()->json([
+                'success'=>false,
+                'message'=>"Gagal Menambahkan Referensi"
+            ], 500);
+        }
     }
 
     public function update(Request $request, $id)
@@ -56,7 +75,8 @@ class ReferensiController extends Controller
             'nilai' => 'required|numeric|min:0|max:100',
         ]);
 
-        DB::update("
+        try {
+            DB::update("
             UPDATE referensi
             SET referensi = ?, kode = ?, nilai = ?
             WHERE id = ? AND status = 1
@@ -69,16 +89,33 @@ class ReferensiController extends Controller
         ]);
 
         return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            
+            return response()->json([
+                'success'=>false,
+                'message'=>"Gagal Update Referensi"
+            ], 500);
+        }
     }
 
     public function delete($id)
     {
-        DB::update("
+       try {
+         DB::update("
             UPDATE referensi
             SET status = 9
             WHERE id = ? AND status = 1
         ", [$id]);
 
         return response()->json(['success' => true]);
+       } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            
+            return response()->json([
+                'success'=>false,
+                'message'=>"Gagal Menghapus Referensi"
+            ], 500);
+        }
     }
 }

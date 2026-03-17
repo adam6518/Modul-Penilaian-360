@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class PeriodeController extends Controller
 {
@@ -16,7 +17,8 @@ class PeriodeController extends Controller
     // Ambil semua data (AJAX)
     public function getData()
     {
-        return response()->json(
+        try {
+            return response()->json(
             DB::select("
                 SELECT id, nama_periode, tanggal_awal, tanggal_akhir, status
                 FROM periode
@@ -24,6 +26,14 @@ class PeriodeController extends Controller
                 ORDER BY id DESC
             ")
         );
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            
+            return response()->json([
+                'success'=>false,
+                'message'=>"Gagal Menampilkan Periode"
+            ], 500);
+        }
     }
 
     public function store(Request $request)
@@ -34,7 +44,8 @@ class PeriodeController extends Controller
             'tanggal_akhir' => 'required|date|after_or_equal:tanggal_awal',
         ]);
 
-        DB::insert("
+       try {
+         DB::insert("
             INSERT INTO periode (nama_periode, tanggal_awal, tanggal_akhir, status)
             VALUES (?, ?, ?, 1)
         ", [
@@ -44,6 +55,14 @@ class PeriodeController extends Controller
         ]);
 
         return response()->json(['success' => true]);
+       } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            
+            return response()->json([
+                'success'=>false,
+                'message'=>"Gagal Menambahkan Periode"
+            ], 500);
+        }
     }
     // Update Periode
     public function update(Request $request, $id)
@@ -54,7 +73,8 @@ class PeriodeController extends Controller
             'tanggal_akhir' => 'required|date|after_or_equal:tanggal_awal',
         ]);
 
-        DB::update("
+       try {
+         DB::update("
             UPDATE periode
             SET nama_periode = ?, tanggal_awal = ?, tanggal_akhir = ?
             WHERE id = ? AND status != 9
@@ -66,17 +86,34 @@ class PeriodeController extends Controller
         ]);
 
         return response()->json(['success' => true]);
+       } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            
+            return response()->json([
+                'success'=>false,
+                'message'=>"Gagal Update Periode"
+            ], 500);
+        }
     }
 
     // Delete Periode
     public function delete($id)
     {
-        DB::update("
+        try {
+            DB::update("
             UPDATE periode
             SET status = 9
             WHERE id = ? AND status != 9
         ", [$id]);
 
         return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            
+            return response()->json([
+                'success'=>false,
+                'message'=>"Gagal Menghapus Periode"
+            ], 500);
+        }
     }
 }

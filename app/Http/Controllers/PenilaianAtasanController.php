@@ -36,29 +36,29 @@ class PenilaianAtasanController extends Controller
     }
 
     // AMBIL DARI DB REFERENSI
-    private function getNilaiReferensi(): array
-    {
-        $rows = DB::select("
-        SELECT referensi, nilai
-        FROM referensi
-        WHERE status = 1
-    ");
+    // private function getNilaiReferensi(): array
+    // {
+    //     $rows = DB::select("
+    //     SELECT referensi, nilai
+    //     FROM referensi
+    //     WHERE status = 1
+    // ");
 
-        $map = [];
-        foreach ($rows as $r) {
-            $map[$r->referensi][] = $r->nilai;
-        }
+    //     $map = [];
+    //     foreach ($rows as $r) {
+    //         $map[$r->referensi][] = $r->nilai;
+    //     }
 
-        return [
-            'col_01' => $map['Ber'][0] ?? 0,
-            'col_02'  => $map['A'][0] ?? 0,
-            'col_03'  => $map['K'][0] ?? 0,
-            'col_04'   => $map['H'][0] ?? 0,
-            'col_05'   => $map['L'][0] ?? 0,
-            'col_06'  => $map['A'][1] ?? 0,
-            'col_07'  => $map['K'][1] ?? 0,
-        ];
-    }
+    //     return [
+    //         'col_01' => $map['Ber'][0] ?? 0,
+    //         'col_02'  => $map['A'][0] ?? 0,
+    //         'col_03'  => $map['K'][0] ?? 0,
+    //         'col_04'   => $map['H'][0] ?? 0,
+    //         'col_05'   => $map['L'][0] ?? 0,
+    //         'col_06'  => $map['A'][1] ?? 0,
+    //         'col_07'  => $map['K'][1] ?? 0,
+    //     ];
+    // }
 
     // AMBIL NAMA TERNILAI DARI DB PERIODE PEGAWAI
     public function getTernilaiByPeriode(Request $request)

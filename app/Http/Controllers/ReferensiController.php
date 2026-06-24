@@ -46,8 +46,8 @@ class ReferensiController extends Controller
 
         try {
             DB::insert("
-            INSERT INTO referensi (referensi, kode, nilai, status)
-            VALUES (?, ?, ?, 1)
+            INSERT INTO referensi (referensi, kode, jenis, nilai, status)
+            VALUES (?, ?, ?, ?, 1)
         ", [
             $data['referensi'],
             $data['kode'],
@@ -70,7 +70,7 @@ class ReferensiController extends Controller
     {
         $data = $request->validate([
             'referensi' => 'required|string',
-            'kode' => 'required|in:col_01,col_02,col_03,col_04,col_05,col_06,col_07',
+            'kode' => 'required|in:atasan,sejawat,bawahan,col_01,col_02,col_03,col_04,col_05,col_06,col_07',
             'jenis' => 'required|string',
             'nilai' => 'required|numeric|min:0|max:100',
         ]);
@@ -78,7 +78,7 @@ class ReferensiController extends Controller
         try {
             DB::update("
             UPDATE referensi
-            SET referensi = ?, kode = ?, nilai = ?
+            SET referensi = ?, kode = ?, jenis = ?, nilai = ?
             WHERE id = ? AND status = 1
         ", [
             $data['referensi'],

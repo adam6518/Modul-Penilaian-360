@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     const btnTambah = document.getElementById("btnTambah");
-    const btnBatal = document / getElementById("btnBatal");
+    const btnBatal = document.getElementById("btnBatal");
     const formTambah = document.getElementById("formTambah");
 
     if (btnTambah) {
@@ -49,7 +49,8 @@ function loadData() {
 
 // Fungsi untuk menampilkan status di tabel referensi
 function renderStatus(status) {
-    if (status == 1) return '<span class="text-center badge bg-success">Aktif</span>';
+    if (status == 1)
+        return '<span class="text-center badge bg-success">Aktif</span>';
     return "";
 }
 
@@ -75,8 +76,9 @@ function renderTable(data) {
                     <button class="btn btn-primary btn-sm editBtn"
                         data-id="${item.id}"
                         data-referensi="${item.referensi}"
-                        data-nilai="${item.nilai}"
-                        data-kode="${item.kode}">
+                        data-kode="${item.kode}"
+                        data-jenis="${item.jenis}"
+                        data-nilai="${item.nilai}">
                         Edit
                     </button>
                     <button class="btn btn-danger btn-sm deleteBtn"
@@ -129,7 +131,7 @@ $(document).ready(function () {
         const payload = {
             referensi: $("#referensi").val(),
             kode: $("#kode").val(),
-            kode: $("#jenis").val(),
+            jenis: $("#jenis").val(),
             nilai: parseFloat($("#nilai").val()),
         };
 
@@ -162,6 +164,7 @@ $(document).ready(function () {
         $("#referensi_id").val($(this).data("id"));
         $("#referensi").val($(this).data("referensi"));
         $("#kode").val($(this).data("kode"));
+        $("#jenis").val($(this).data("jenis"));
         $("#nilai").val($(this).data("nilai"));
 
         $("#formTambah").removeClass("d-none");

@@ -104,7 +104,7 @@ class PenilaianSejawatController extends Controller
     {
         $periodeId = $request->periode_id;
         $rows = $request->penilaian;
-        $userLoggedIn = session('active_user_id');
+        $userId = session('active_user_id');
 
         if (!is_array($rows) || empty($rows)) {
             return response()->json([
@@ -126,7 +126,7 @@ class PenilaianSejawatController extends Controller
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ", [
                     $periodeId,
-                    $userLoggedIn['id'],
+                    $userId,
                     $row['id_ternilai'],
 
                     // HITUNG NILAI

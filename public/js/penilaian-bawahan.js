@@ -123,7 +123,7 @@ function renderCheckboxTernilai(data) {
         });
     }
 
-    $("#PenilaianAtasanTableBody").html(html);
+    $("#PenilaianBawahanTableBody").html(html);
 }
 
 /* ===============================
@@ -266,7 +266,7 @@ $(document).ready(function () {
     $(document).on("keyup", "input[data-field='id_penilai']", function () {
         const keyword = $(this).val().toLowerCase();
 
-        $("#PenilaianAtasanTableBody tr").each(function () {
+        $("#PenilaianBawahanTableBody tr").each(function () {
             const nama = $(this).data("nama") || "";
             $(this).toggle(nama.includes(keyword));
         });

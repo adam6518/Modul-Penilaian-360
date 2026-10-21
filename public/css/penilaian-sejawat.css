@@ -1,16 +1,294 @@
-.btn-primary {
-    background-color: #1f3a5f;
+/* =========================================================
+   PENILAIAN SEJAWAT
+   Base components: penilaian-bawahan.css
+   Theme: indigo / violet
+   ========================================================= */
+
+@import url("/css/penilaian-bawahan.css");
+
+.evaluation-peer {
+    --eval-accent: #5365d8;
+    --eval-accent-dark: #3d4cb6;
+    --eval-accent-soft: #eef0ff;
+    --eval-accent-border: #dfe3ff;
+    --eval-ink: #202746;
+    --eval-muted: #858da5;
+    --eval-border: #e4e7f2;
 }
 
-.btn-danger {
-    background-color: #c62828;
+/* HERO */
+
+.evaluation-peer .evaluation-hero {
+    border-color: #dfe3ff;
+    background: linear-gradient(112deg, #fff 0%, #f4f5ff 65%, #eceeff 100%);
 }
 
-.btn-secondary {
-    background-color: #4a6fa5;
+.evaluation-peer .evaluation-eyebrow {
+    color: #5365d8;
 }
 
-.table th,
-.table td {
-    vertical-align: middle;
+.evaluation-peer .evaluation-hero-content > p {
+    color: #737d9c;
+}
+
+.evaluation-peer .evaluation-hero-tags span {
+    border-color: #e0e4fa;
+    color: #646f96;
+}
+
+.evaluation-peer .evaluation-hero-tags i {
+    color: #5365d8;
+}
+
+.evaluation-peer .evaluation-orbit {
+    border-color: rgba(83, 101, 216, 0.15);
+}
+
+.evaluation-peer .evaluation-visual-icon {
+    background: #eef0ff;
+    color: #5365d8;
+}
+
+.evaluation-peer .evaluation-hero-visual-card > span {
+    color: #8389a9;
+}
+
+.evaluation-peer .evaluation-hero-visual-card > strong {
+    color: #3d4cb6;
+}
+
+.evaluation-peer .evaluation-visual-progress {
+    background: #e7e9fb;
+}
+
+.evaluation-peer .evaluation-visual-progress span {
+    background: #5365d8;
+}
+
+.evaluation-peer .evaluation-visual-floating {
+    border-color: #dfe3ff;
+    color: #5365d8;
+}
+
+.evaluation-peer .evaluation-floating-two {
+    color: #9165d6;
+}
+
+/* PERIOD SELECTOR */
+
+.evaluation-peer .evaluation-context-icon {
+    background: #eef0ff;
+    color: #5365d8;
+}
+
+.evaluation-peer .evaluation-period-button > i:first-child {
+    color: #5365d8;
+}
+
+.evaluation-peer .evaluation-load-button {
+    border-color: #5365d8;
+    background: #5365d8;
+}
+
+.evaluation-peer .evaluation-load-button:hover {
+    border-color: #3d4cb6;
+    background: #3d4cb6;
+}
+
+/* OVERVIEW */
+
+.evaluation-peer .overview-icon-primary {
+    background: #eef0ff;
+    color: #5365d8;
+}
+
+.evaluation-peer .overview-icon-success {
+    background: #e7f7f0;
+    color: #16856b;
+}
+
+.evaluation-peer .overview-icon-purple {
+    background: #f3edff;
+    color: #8a61ce;
+}
+
+.evaluation-peer .evaluation-overview-card:hover {
+    border-color: #dce1fb;
+}
+
+/* SECTION LABELS */
+
+.evaluation-peer .evaluation-section-kicker {
+    color: #5365d8;
+}
+
+.evaluation-peer .evaluation-bulk-panel,
+.evaluation-peer .evaluation-workspace-panel {
+    border-color: #e2e5f2;
+}
+
+/* BULK INPUT */
+
+.evaluation-peer .evaluation-score-field .form-control:focus {
+    border-color: #5365d8;
+    box-shadow: 0 0 0 3px rgba(83, 101, 216, 0.11);
+}
+
+.evaluation-peer .evaluation-bulk-footer {
+    background: #fafaff;
+}
+
+.evaluation-peer .evaluation-bulk-footer p i {
+    color: #5365d8;
+}
+
+.evaluation-peer .evaluation-bulk-footer .btn {
+    border-color: #5365d8;
+    background: #5365d8;
+}
+
+.evaluation-peer .evaluation-bulk-footer .btn:hover {
+    border-color: #3d4cb6;
+    background: #3d4cb6;
+}
+
+/* SEARCH */
+
+.evaluation-peer .evaluation-search {
+    border-color: #e1e5f2;
+    background: #fbfbff;
+}
+
+.evaluation-peer .evaluation-search:focus-within {
+    border-color: #5365d8;
+    box-shadow: 0 0 0 3px rgba(83, 101, 216, 0.08);
+}
+
+/* GUIDANCE */
+
+.evaluation-peer .evaluation-guidance-strip {
+    border-color: #e0e4fa;
+    background: #f7f8ff;
+    color: #77809e;
+}
+
+.evaluation-peer .evaluation-guidance-strip > i {
+    color: #5365d8;
+}
+
+/* TABLE */
+
+.evaluation-peer .evaluation-table thead th {
+    border-bottom-color: #e6e8f5;
+    background: #f6f7fd;
+    color: #737e9d;
+}
+
+.evaluation-peer .evaluation-table tbody td {
+    border-bottom-color: #eceef6;
+    color: #4d5671;
+}
+
+.evaluation-peer .evaluation-table tbody tr:hover td {
+    background: #fcfcff;
+}
+
+.evaluation-peer .evaluation-select-all input,
+.evaluation-peer .evaluation-table input[type="checkbox"] {
+    accent-color: #5365d8;
+}
+
+.evaluation-peer
+    .evaluation-table
+    input:not([type="checkbox"]):not([type="hidden"]):focus {
+    border-color: #5365d8;
+    box-shadow: 0 0 0 2px rgba(83, 101, 216, 0.08);
+}
+
+/* EMPTY STATE */
+
+.evaluation-peer .evaluation-empty-icon {
+    background: #eef0ff;
+    color: #5365d8;
+}
+
+.evaluation-peer .evaluation-table-footer {
+    background: #fafaff;
+}
+
+.evaluation-peer .evaluation-secure-label i {
+    color: #16856b;
+}
+
+/* SUBMIT */
+
+.evaluation-peer .evaluation-submit-panel {
+    border-color: #e1e5f3;
+    background: linear-gradient(105deg, #fff, #f7f7ff);
+}
+
+.evaluation-peer .evaluation-submit-icon {
+    background: #e7f7f0;
+    color: #16856b;
+}
+
+.evaluation-peer .evaluation-submit-copy h3 {
+    color: #303954;
+}
+
+.evaluation-peer .evaluation-submit-copy p {
+    color: #858da5;
+}
+
+.evaluation-peer .evaluation-submit-button {
+    border-color: #16856b;
+    background: #16856b;
+}
+
+.evaluation-peer .evaluation-submit-button:hover {
+    border-color: #106b55;
+    background: #106b55;
+}
+
+/* ACCESSIBILITY */
+
+.evaluation-peer :focus-visible {
+    outline: 2px solid #5365d8;
+    outline-offset: 3px;
+}
+
+/* RESPONSIVE OVERRIDES */
+
+@media (max-width: 991.98px) {
+    .evaluation-peer .evaluation-hero {
+        background: linear-gradient(112deg, #fff 0%, #f4f5ff 70%, #eceeff 100%);
+    }
+}
+
+@media (max-width: 767.98px) {
+    .evaluation-peer .evaluation-hero {
+        padding: 27px 22px;
+    }
+
+    .evaluation-peer .evaluation-context-panel {
+        padding: 19px;
+    }
+
+    .evaluation-peer .evaluation-bulk-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .evaluation-peer .evaluation-submit-button {
+        width: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .evaluation-peer *,
+    .evaluation-peer *::before,
+    .evaluation-peer *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+    }
 }

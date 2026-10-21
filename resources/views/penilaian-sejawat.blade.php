@@ -1,125 +1,394 @@
-@extends('layouts.app')
-
-@push('scripts')
-    <script src="{{ asset('js/penilaian-sejawat.js') }}"></script>
-@endpush
+@extends('layouts.app', ['title' => 'Penilaian Sejawat'])
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/penilaian-sejawat.css') }}">
 @endpush
 
-@section('content')
-    <h1 class="fw-bold mb-4">Penilaian Sejawat</h1>
+@push('scripts')
     <script>
-        window.USER_PENILAI = @json($userPenilai); //userPenilai berasal dari func index di controller
+        window.USER_PENILAI = @json($userPenilai);
         window.INDIKATOR = @json($indikator);
+        window.APP_ROLE = @json(session('role'));
     </script>
-    <div id="formTambah" class="mb-4">
-        <div class="d-flex gap-2">
-            <div>
-                <button id="btnPeriode" class="btn dropdown-toggle btn-sm border border-black border-2 text-start text-center"
-                    type="button" data-bs-toggle="dropdown">
-                    -- Pilih Periode --
-                </button>
+    <script src="{{ asset('js/penilaian-sejawat.js') }}"></script>
+@endpush
 
-                <ul class="dropdown-menu border border-black text-start w-25" id="periodeDropdown">
-                </ul>
+@section('content')
+    <div class="evaluation-page evaluation-subordinate evaluation-peer">
+
+        {{-- HERO --}}
+        <section class="evaluation-hero">
+            <div class="evaluation-hero-content">
+                <div class="evaluation-eyebrow">
+                    <i class="bi bi-people"></i>
+                    PERFORMANCE MANAGEMENT / 360°
+                </div>
+
+                <h1>Penilaian Sejawat</h1>
+
+                <p>
+                    Berikan evaluasi kepada rekan kerja berdasarkan kolaborasi,
+                    perilaku kerja, dan indikator BerAKHLAK. Nilai secara objektif
+                    berdasarkan interaksi profesional selama periode penilaian.
+                </p>
+
+                <div class="evaluation-hero-tags">
+                    <span><i class="bi bi-people-fill"></i> Evaluasi rekan kerja</span>
+                    <span><i class="bi bi-list-check"></i> Berbasis indikator</span>
+                    <span><i class="bi bi-shield-check"></i> Penilaian terstruktur</span>
+                </div>
             </div>
-            <div>
-                <button id="btnTampil" class="btn btn-primary btn-sm">
-                    Tampilkan
+
+            <div class="evaluation-hero-visual" aria-hidden="true">
+                <div class="evaluation-orbit evaluation-orbit-large"></div>
+                <div class="evaluation-orbit evaluation-orbit-small"></div>
+
+                <div class="evaluation-hero-visual-card">
+                    <div class="evaluation-visual-icon">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <span>PEER REVIEW</span>
+                    <strong>360°</strong>
+                    <div class="evaluation-visual-progress">
+                        <span></span>
+                    </div>
+                </div>
+
+                <div class="evaluation-visual-floating evaluation-floating-one">
+                    <i class="bi bi-person-check"></i>
+                </div>
+
+                <div class="evaluation-visual-floating evaluation-floating-two">
+                    <i class="bi bi-diagram-3"></i>
+                </div>
+            </div>
+        </section>
+
+        {{-- PERIODE --}}
+        <section class="evaluation-context-panel">
+            <div class="evaluation-context-heading">
+                <div class="evaluation-context-icon">
+                    <i class="bi bi-calendar2-week"></i>
+                </div>
+
+                <div>
+                    <h2>Periode penilaian</h2>
+                    <p>Pilih periode untuk memuat daftar rekan kerja yang perlu dinilai.</p>
+                </div>
+            </div>
+
+            <div class="evaluation-context-actions">
+                <div class="dropdown evaluation-period-dropdown-wrapper">
+                    <button id="btnPeriode" class="btn btn-light dropdown-toggle evaluation-period-button" type="button"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-calendar3"></i>
+                        <span>-- Pilih Periode --</span>
+                    </button>
+
+                    <ul class="dropdown-menu" id="periodeDropdown"></ul>
+                </div>
+
+                <button id="btnTampil" type="button" class="btn btn-primary evaluation-load-button">
+                    <i class="bi bi-arrow-right-circle"></i>
+                    Tampilkan data
                 </button>
             </div>
-        </div>
-    </div>
-    <div class="row g-2 mb-3 d-none" id="formNilaiGlobal">
-        <div class="col">
-            <input type="number" class="form-control form-control-sm" id="nilai_ber" placeholder="Ber">
-        </div>
-        <div class="col">
-            <input type="number" class="form-control form-control-sm" id="nilai_a1" placeholder="A">
-        </div>
-        <div class="col">
-            <input type="number" class="form-control form-control-sm" id="nilai_k1" placeholder="K">
-        </div>
-        <div class="col">
-            <input type="number" class="form-control form-control-sm" id="nilai_h" placeholder="H">
-        </div>
-        <div class="col">
-            <input type="number" class="form-control form-control-sm" id="nilai_l" placeholder="L">
-        </div>
-        <div class="col">
-            <input type="number" class="form-control form-control-sm" id="nilai_a2" placeholder="A">
-        </div>
-        <div class="col">
-            <input type="number" class="form-control form-control-sm" id="nilai_k2" placeholder="K">
-        </div>
+        </section>
 
-        <div class="col-auto">
-            <button id="btnApplyNilai" class="btn btn-primary btn-sm">
-                Terapkan Nilai
+        {{-- RINGKASAN --}}
+        <section class="evaluation-overview-grid">
+            <article class="evaluation-overview-card">
+                <div class="evaluation-overview-icon overview-icon-primary">
+                    <i class="bi bi-people"></i>
+                </div>
+
+                <div class="evaluation-overview-copy">
+                    <span>Total sejawat</span>
+                    <strong id="evaluationTargetCount">—</strong>
+                    <small>Rekan kerja dalam daftar penilaian</small>
+                </div>
+            </article>
+
+            <article class="evaluation-overview-card">
+                <div class="evaluation-overview-icon overview-icon-success">
+                    <i class="bi bi-check2-square"></i>
+                </div>
+
+                <div class="evaluation-overview-copy">
+                    <span>Terpilih</span>
+                    <strong id="evaluationSelectedCount">0</strong>
+                    <small>Rekan kerja yang dipilih</small>
+                </div>
+            </article>
+
+            <article class="evaluation-overview-card">
+                <div class="evaluation-overview-icon overview-icon-purple">
+                    <i class="bi bi-ui-checks"></i>
+                </div>
+
+                <div class="evaluation-overview-copy">
+                    <span>Indikator</span>
+                    <strong>{{ count($indikator) }}</strong>
+                    <small>Parameter penilaian tersedia</small>
+                </div>
+            </article>
+        </section>
+
+        {{-- INPUT MASSAL --}}
+        <section id="formNilaiGlobal" class="evaluation-bulk-panel d-none">
+            <div class="evaluation-section-heading">
+                <div>
+                    <span class="evaluation-section-kicker">BULK INPUT</span>
+                    <h2>Pengisian nilai massal</h2>
+                    <p>
+                        Isi nilai indikator, pilih rekan kerja pada tabel, lalu terapkan
+                        nilai secara massal.
+                    </p>
+                </div>
+
+                <span class="evaluation-bulk-badge">
+                    <i class="bi bi-lightning-charge-fill"></i>
+                    Aksi massal
+                </span>
+            </div>
+
+            <div class="evaluation-bulk-grid">
+                <div class="evaluation-score-field">
+                    <label for="nilai_ber">BER</label>
+                    <input type="number" id="nilai_ber" class="form-control" min="0" step="0.01" placeholder="0">
+                </div>
+
+                <div class="evaluation-score-field">
+                    <label for="nilai_a1">A</label>
+                    <input type="number" id="nilai_a1" class="form-control" min="0" step="0.01" placeholder="0">
+                </div>
+
+                <div class="evaluation-score-field">
+                    <label for="nilai_k1">K</label>
+                    <input type="number" id="nilai_k1" class="form-control" min="0" step="0.01" placeholder="0">
+                </div>
+
+                <div class="evaluation-score-field">
+                    <label for="nilai_h">H</label>
+                    <input type="number" id="nilai_h" class="form-control" min="0" step="0.01" placeholder="0">
+                </div>
+
+                <div class="evaluation-score-field">
+                    <label for="nilai_l">L</label>
+                    <input type="number" id="nilai_l" class="form-control" min="0" step="0.01"
+                        placeholder="0">
+                </div>
+
+                <div class="evaluation-score-field">
+                    <label for="nilai_a2">A</label>
+                    <input type="number" id="nilai_a2" class="form-control" min="0" step="0.01"
+                        placeholder="0">
+                </div>
+
+                <div class="evaluation-score-field">
+                    <label for="nilai_k2">K</label>
+                    <input type="number" id="nilai_k2" class="form-control" min="0" step="0.01"
+                        placeholder="0">
+                </div>
+            </div>
+
+            <div class="evaluation-bulk-footer">
+                <p>
+                    <i class="bi bi-info-circle"></i>
+                    Nilai akan diterapkan pada rekan kerja yang dicentang.
+                </p>
+
+                <button id="btnApplyNilai" type="button" class="btn btn-primary">
+                    <i class="bi bi-check2-all"></i>
+                    Terapkan nilai
+                </button>
+            </div>
+        </section>
+
+        {{-- DAFTAR SEJAWAT --}}
+        <section class="evaluation-workspace-panel">
+            <div class="evaluation-workspace-heading">
+                <div>
+                    <span class="evaluation-section-kicker">EVALUATION WORKSPACE</span>
+                    <h2>Daftar rekan kerja</h2>
+                    <p>
+                        Pilih rekan kerja yang akan dinilai dan lengkapi nilai setiap indikator.
+                    </p>
+                </div>
+
+                <div class="evaluation-list-tools">
+                    <label class="evaluation-search">
+                        <i class="bi bi-search"></i>
+                        <input id="searchSejawat" type="search" placeholder="Cari nama atau NIP..."
+                            aria-label="Cari rekan kerja">
+                    </label>
+                </div>
+            </div>
+
+            <div class="evaluation-guidance-strip">
+                <i class="bi bi-info-circle-fill"></i>
+                <span>
+                    Pilih periode sebelum mengisi penilaian. Gunakan pengamatan profesional
+                    dan pastikan nilai seluruh indikator sudah sesuai sebelum menyimpan.
+                </span>
+            </div>
+
+            <div class="evaluation-table-wrap">
+                <div class="table-responsive">
+                    <table class="table evaluation-table align-middle">
+                        <thead>
+                            <tr>
+                                <th class="evaluation-person-column">
+                                    <label class="evaluation-select-all">
+                                        <input type="checkbox" id="checkAll">
+                                        <span>Rekan kerja</span>
+                                    </label>
+                                </th>
+
+                                <th>Identitas penilai</th>
+
+                                @foreach ($indikator as $item)
+                                    <th class="text-center">
+                                        {{ $item->referensi }}
+                                    </th>
+                                @endforeach
+
+                                <th class="text-center">Status</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="PenilaianSejawatTableBody">
+                            <tr>
+                                <td colspan="{{ count($indikator) + 3 }}">
+                                    <div class="evaluation-empty-state">
+                                        <div class="evaluation-empty-icon">
+                                            <i class="bi bi-people"></i>
+                                        </div>
+
+                                        <h3>Belum ada daftar rekan kerja</h3>
+
+                                        <p>
+                                            Pilih periode dan klik Tampilkan data untuk memulai.
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="evaluation-table-footer">
+                <span>
+                    <i class="bi bi-arrows-angle-expand"></i>
+                    Geser tabel secara horizontal untuk melihat seluruh indikator.
+                </span>
+
+                <span class="evaluation-secure-label">
+                    <i class="bi bi-shield-lock"></i>
+                    Penilaian terstruktur
+                </span>
+            </div>
+        </section>
+
+        {{-- SIMPAN --}}
+        <section class="evaluation-submit-panel">
+            <div class="evaluation-submit-copy">
+                <div class="evaluation-submit-icon">
+                    <i class="bi bi-clipboard2-check"></i>
+                </div>
+
+                <div>
+                    <h3>Periksa penilaian sebelum menyimpan</h3>
+                    <p>
+                        Pastikan rekan kerja dan nilai indikator sudah sesuai sebelum mengirim data.
+                    </p>
+                </div>
+            </div>
+
+            <button id="btnSubmitPenilaian" type="button" class="btn btn-success evaluation-submit-button d-none">
+                <i class="bi bi-cloud-check"></i>
+                Simpan penilaian
             </button>
-        </div>
+        </section>
+
     </div>
 
-    <div class="card shadow-sm">
-        <div class="card-body">
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tableBody = document.getElementById('PenilaianSejawatTableBody');
+            const selectedCount = document.getElementById('evaluationSelectedCount');
+            const targetCount = document.getElementById('evaluationTargetCount');
+            const checkAll = document.getElementById('checkAll');
+            const searchInput = document.getElementById('searchSejawat');
 
-            <div class="table-responsive overflow-x-auto">
-                <table class="table table-hover align-middle table-bordered">
-                    <thead class="table-dark text-center table-group-divider">
-                        <tr>
-                            <th>
-                                <input type="checkbox" id="checkAll">
-                                <span class="ms-1">Nama Ternilai</span>
-                            </th>
-                            <th>Nama Penilai</th>
-                            @foreach ($indikator as $item)
-                                <th>{{ $item->referensi }}</th>
-                            @endforeach
-                            <th>Aksi</th>
-                        </tr>
-                        {{-- Search Row (Responsive Bootstrap Only) --}}
-                        <tr class="bg-light">
-                            <th>
-                                <div class="d-flex flex-column flex-lg-row gap-2">
-                                    <input type="text" class="form-control form-control-sm"
-                                        placeholder="Cari Nama Ternilai" data-field="id_penilai">
-                                </div>
-                            </th>
-                            <th>
-                                <div class="d-flex flex-column flex-lg-row gap-2">
-                                </div>
-                            </th>
-                            <th>
-                            </th>
-                            <th>
-                            </th>
-                            <th>
-                            </th>
-                            <th>
-                            </th>
-                            <th>
-                            </th>
-                            <th>
-                            </th>
-                            <th>
-                            </th>
-                            <th>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody id="PenilaianAtasanTableBody">
-                        {{-- DI SINI LOOPING DI JAVASCRIPT  --}}
-                    </tbody>
-                </table>
-            </div>
+            function updateCounters() {
+                const checkboxes = tableBody ?
+                    tableBody.querySelectorAll('.checkTernilai') :
+                    [];
 
-        </div>
-    </div>
-    <div class="d-flex justify-content-end mt-3">
-        <button id="btnSubmitPenilaian" class="btn btn-success d-none">
-            Simpan Penilaian
-        </button>
-    </div>
+                const selected = tableBody ?
+                    tableBody.querySelectorAll('.checkTernilai:checked') :
+                    [];
+
+                if (selectedCount) {
+                    selectedCount.textContent = selected.length;
+                }
+
+                if (targetCount) {
+                    targetCount.textContent = checkboxes.length;
+                }
+
+                if (checkAll) {
+                    checkAll.checked =
+                        checkboxes.length > 0 &&
+                        selected.length === checkboxes.length;
+
+                    checkAll.indeterminate =
+                        selected.length > 0 &&
+                        selected.length < checkboxes.length;
+                }
+            }
+
+            if (tableBody) {
+                tableBody.addEventListener('change', function(event) {
+                    if (event.target.matches('.checkTernilai')) {
+                        updateCounters();
+                    }
+                });
+
+                new MutationObserver(updateCounters).observe(tableBody, {
+                    childList: true,
+                    subtree: true
+                });
+            }
+
+            if (checkAll && tableBody) {
+                checkAll.addEventListener('change', function() {
+                    tableBody.querySelectorAll('.checkTernilai').forEach(function(checkbox) {
+                        checkbox.checked = checkAll.checked;
+                        checkbox.dispatchEvent(new Event('change', {
+                            bubbles: true
+                        }));
+                    });
+
+                    updateCounters();
+                });
+            }
+
+            if (searchInput && tableBody) {
+                searchInput.addEventListener('input', function() {
+                    const keyword = this.value.toLowerCase().trim();
+
+                    tableBody.querySelectorAll('tr').forEach(function(row) {
+                        row.style.display = row.textContent.toLowerCase().includes(keyword) ?
+                            '' :
+                            'none';
+                    });
+                });
+            }
+
+            updateCounters();
+        });
+    </script>
 @endsection
